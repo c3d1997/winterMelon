@@ -12,7 +12,7 @@ const route = useRoute();
 <style lang="scss">
 .containerBg {
   position: absolute;
-  background-image: url(/public/images/bg.png);
+  background-image: url(/images/bg.png);
   height: 100dvh;
   width: 100%;
   z-index: 1; // 設定濾鏡層級
@@ -79,5 +79,13 @@ const route = useRoute();
       height: 100%;
     }
   }
+}
+.hiddenInput {
+  display: none;
+}
+.errorMessage {
+  font-size: 12px;
+  color: rgb(255, 11, 11);
+  padding: 6px 0;
 }
 </style>
