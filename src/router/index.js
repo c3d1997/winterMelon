@@ -18,6 +18,12 @@ const routes = [
         component: () =>
           import("@/views/pages/registration/RegistrationPhone.vue"),
       },
+      {
+        path: "/registration/mbti",
+        name: "mbti",
+        component: () =>
+          import("@/views/pages/registration/RegistrationMbti.vue"),
+      },
     ],
   },
 ];
