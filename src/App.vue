@@ -13,6 +13,7 @@ const route = useRoute();
 .containerBg {
   position: fixed;
   background-image: url(/images/bg.png);
+
   height: 100%;
   width: 100%;
   z-index: 1;

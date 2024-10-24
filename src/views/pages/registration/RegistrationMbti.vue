@@ -246,7 +246,7 @@ const mbtiTypes = [
         position: absolute;
         width: 100%;
         text-align: center;
-        top: -2px;
+        top: -3px;
       }
       &::after {
         content: "";
