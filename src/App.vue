@@ -11,11 +11,11 @@ const route = useRoute();
 
 <style lang="scss">
 .containerBg {
-  position: absolute;
+  position: fixed;
   background-image: url(/images/bg.png);
-  height: 100dvh;
+  height: 100%;
   width: 100%;
-  z-index: 1; // 設定濾鏡層級
+  z-index: 1;
   &-filter {
     &::before {
       content: "";
@@ -36,13 +36,15 @@ const route = useRoute();
   height: 100%;
   padding: 0 30px;
 }
+
 .title {
-  padding-top: 28px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
+  padding-top: 30px;
   img {
     width: 100%;
   }
 }
+
 .flex-center {
   display: flex;
   justify-content: center;
@@ -85,47 +87,6 @@ const route = useRoute();
     img {
       width: 100%;
       object-fit: contain;
-    }
-  }
-}
-.borderType {
-  &_1 {
-    width: 100%;
-    border: 15px solid;
-    margin: auto;
-    border-image: url(/images/border_01.svg) stretch;
-    border-image-slice: 17 fill;
-    &-inner {
-      background-color: #f3e5c2;
-      width: 100%;
-      padding: 7px;
-      height: 100%;
-    }
-  }
-  &_2 {
-    width: 100%;
-    border: 13px solid;
-    margin: auto;
-    border-image: url(/images/border_02.svg) stretch;
-    border-image-slice: 16 fill;
-    &-inner {
-      background-color: #e8cfa6;
-      width: 100%;
-      padding: 7px;
-      height: 100%;
-    }
-  }
-  &_3 {
-    width: 100%;
-    border: 13px solid;
-    margin: auto;
-    border-image: url(/images/border_03.svg) stretch;
-    border-image-slice: 16 fill;
-    &-inner {
-      background-color: #e8cfa6;
-      width: 100%;
-      padding: 7px;
-      height: 100%;
     }
   }
 }
