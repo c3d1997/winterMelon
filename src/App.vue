@@ -106,4 +106,56 @@ const route = useRoute();
   color: rgb(255, 11, 11);
   padding: 6px 0;
 }
+
+.popup {
+  position: fixed;
+  top: 50%;
+  width: 100%;
+  padding: 30px;
+  z-index: 10;
+  max-width: 475px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  &_card {
+    width: 100%;
+    border: 18px solid;
+    border-image: url(/images/border_02.png) stretch;
+    border-image-slice: 32 fill;
+    position: relative;
+    padding: 10px 0;
+    min-height: 270px;
+    &::after {
+      content: "";
+      position: absolute;
+      width: calc(100% + 18px);
+      height: calc(100% + 18px);
+      left: -9px;
+      top: -9px;
+      z-index: -1;
+      background-color: #e8cfa6;
+    }
+    &-X {
+      position: absolute;
+      right: -32px;
+      top: -32px;
+      width: 42px;
+      img {
+        width: 100%;
+      }
+    }
+    &-content {
+      color: $main-color;
+      p {
+        font-size: 18px;
+        font-weight: 600;
+      }
+      span {
+        font-size: 15px;
+        line-height: 20px;
+        margin-top: 10px;
+        display: block;
+      }
+    }
+  }
+}
 </style>

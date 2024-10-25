@@ -38,6 +38,20 @@ const routes = [
       },
     ],
   },
+  {
+    path: "/QA",
+    component: () =>
+      import("@/views/pages/dataCollection/DataCollectionView.vue"),
+    meta: { keep_live: false },
+    children: [
+      {
+        path: "",
+        name: "QA",
+        component: () =>
+          import("@/views/pages/dataCollection/DataCollectionQA.vue"),
+      },
+    ],
+  },
 ];
 
 const router = createRouter({
