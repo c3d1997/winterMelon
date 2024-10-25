@@ -26,6 +26,18 @@ const routes = [
       },
     ],
   },
+  {
+    path: "/game",
+    component: () => import("@/views/pages/game/GameView.vue"),
+    meta: { keep_live: false },
+    children: [
+      {
+        path: "",
+        name: "game",
+        component: () => import("@/views/pages/game/GamePlay.vue"),
+      },
+    ],
+  },
 ];
 
 const router = createRouter({

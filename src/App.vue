@@ -13,7 +13,7 @@ const route = useRoute();
 .containerBg {
   position: fixed;
   background-image: url(/images/bg.png);
-
+  background-repeat: repeat;
   height: 100%;
   width: 100%;
   z-index: 1;
@@ -29,6 +29,7 @@ const route = useRoute();
     }
   }
 }
+
 .container {
   position: relative;
   z-index: 2;
@@ -41,6 +42,7 @@ const route = useRoute();
 .title {
   margin-bottom: 20px;
   padding-top: 30px;
+
   img {
     width: 100%;
   }
@@ -51,40 +53,46 @@ const route = useRoute();
   justify-content: center;
   align-items: center;
 }
+
 .inputStyle {
   position: relative;
+
   &_Input {
     width: 100%;
     line-height: 38px;
     height: 48px;
-    border: 5px solid transparent;
+    border: 8px solid transparent;
     font-size: 15px;
     padding-left: 45px;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    border-image: url(/images/border_04.svg) 16 stretch;
+    border-image: url(/images/border_04.png) 32 stretch;
     background-color: transparent;
+
     &:focus {
       outline: 0;
     }
   }
+
   &:after {
     content: "";
     position: absolute;
-    width: calc(100% - 6px);
-    height: calc(100% - 6px);
+    width: calc(100% - 4px);
+    height: calc(100% - 4px);
     z-index: -1;
-    top: 3px;
-    left: 3px;
+    top: 4px;
+    left: 4px;
     background-color: white;
   }
+
   &_icon {
     position: absolute;
     width: 16px;
     top: 0;
     left: 18px;
     top: calc(50% - 9px);
+
     img {
       width: 100%;
       object-fit: contain;
@@ -97,19 +105,5 @@ const route = useRoute();
   font-size: 12px;
   color: rgb(255, 11, 11);
   padding: 6px 0;
-}
-
-.buttonType {
-  &_normal {
-    border: 4px solid;
-    border-image: url(/images/border_04.svg) stretch;
-    border-image-slice: 16 fill;
-    line-height: 40px;
-    &-inner {
-      background-color: $main-color;
-      color: white;
-      text-align: center;
-    }
-  }
 }
 </style>

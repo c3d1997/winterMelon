@@ -143,6 +143,7 @@ const mbtiTypes = [
 .mbtiCard {
   position: relative;
   z-index: 2;
+  margin: auto;
   margin-bottom: 95px;
   &_top {
     background: url(/images/fenceBG_top.png) repeat-x;
@@ -164,9 +165,9 @@ const mbtiTypes = [
     &-card {
       position: relative;
       z-index: 2;
-      border: 15px solid;
-      border-image: url(/images/border_02.svg) stretch;
-      border-image-slice: 16 fill;
+      border: 24px solid;
+      border-image: url(/images/border_02.png) stretch;
+      border-image-slice: 32 fill;
       height: 90px;
       display: flex;
       align-items: center;
@@ -196,10 +197,10 @@ const mbtiTypes = [
       &::after {
         content: "";
         position: absolute;
-        width: 100%;
-        height: 100%;
-        left: 0;
-        top: 0;
+        width: calc(100% + 14px);
+        height: calc(100% + 14px);
+        left: -7px;
+        top: -7px;
         z-index: -1;
         background-color: #e8cfa6;
       }
@@ -208,19 +209,22 @@ const mbtiTypes = [
   &_carousel {
     padding: 0 30px;
     &-card {
+      position: relative;
+      z-index: 2;
       padding-top: 16px;
       padding-bottom: 10px;
-      border: 15px solid;
-      border-image: url(/images/border_01.svg) stretch;
-      border-image-slice: 17 fill;
-      position: relative;
-      &::before {
+      border: 24px solid;
+      border-image: url(/images/border_01.png) stretch;
+      border-image-slice: 34 fill;
+      background: transparent;
+      &::after {
         content: "";
         position: absolute;
-        top: 0;
-        left: -2px;
-        width: 101%;
-        height: 100%;
+        width: calc(100% + 13px);
+        height: calc(100% + 12px);
+        left: -6.5px;
+        top: -6px;
+        z-index: -1;
         background-color: $secondLight-color;
       }
     }
@@ -231,9 +235,9 @@ const mbtiTypes = [
     transform: translateX(-50%);
     bottom: -30px;
     &-start {
-      border: 20px solid;
-      border-image: url(/images/border_03.svg) stretch;
-      border-image-slice: 16 fill;
+      border: 25px solid;
+      border-image: url(/images/border_03.png) stretch;
+      border-image-slice: 32 fill;
       position: relative;
       z-index: 2;
       height: 60px;
@@ -246,15 +250,15 @@ const mbtiTypes = [
         position: absolute;
         width: 100%;
         text-align: center;
-        top: -3px;
+        top: -7px;
       }
       &::after {
         content: "";
         position: absolute;
-        width: 100%;
-        height: 100%;
-        left: 0;
-        top: 0;
+        width: calc(100% + 12px);
+        height: calc(100% + 12px);
+        left: -6px;
+        top: -6px;
         z-index: -1;
         background-color: #e8cfa6;
       }
@@ -298,13 +302,13 @@ const mbtiTypes = [
   }
   &_index {
     position: absolute;
-    top: -24px;
+    top: -30px;
     left: 50%;
     transform: translateX(-50%);
     width: 82px;
     height: 38px;
     border: 11px solid;
-    border-image: url(/images/border_02.svg) stretch;
+    border-image: url(/images/border_02.png) stretch;
     border-image-slice: 16 fill;
     z-index: 2;
     font-size: 15px;
@@ -341,10 +345,10 @@ const mbtiTypes = [
   position: absolute;
   width: 22px;
   &-left {
-    left: -50px;
+    left: -58px;
   }
   &-right {
-    right: -50px;
+    right: -58px;
   }
 }
 </style>

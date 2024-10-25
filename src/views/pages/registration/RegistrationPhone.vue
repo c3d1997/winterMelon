@@ -132,13 +132,13 @@ const onCodeInput = () => {
   width: 100%;
   line-height: 38px;
   height: 48px;
-  border: 5px solid transparent;
+  border: 8px solid transparent;
   font-size: 15px;
   padding-left: 15px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  border-image: url(/images/border_04.svg) 16 stretch;
+  border-image: url(/images/border_04.png) 32 stretch;
   padding-left: 0px;
 
   &:focus {
@@ -147,11 +147,11 @@ const onCodeInput = () => {
   &::after {
     content: "";
     position: absolute;
-    width: calc(100% - 8px);
-    height: calc(100% - 8px);
+    width: calc(100% - 4px);
+    height: calc(100% - 4px);
     z-index: -1;
-    top: 0;
-    left: 0;
+    top: -2px;
+    left: -2px;
     padding: 4px;
     background-color: #fff;
   }
