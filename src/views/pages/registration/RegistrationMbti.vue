@@ -255,9 +255,9 @@ const mbtiTypes = [
       &::after {
         content: "";
         position: absolute;
-        width: calc(100% + 12px);
-        height: calc(100% + 12px);
-        left: -6px;
+        width: calc(100% + 14px);
+        height: calc(100% + 13px);
+        left: -7px;
         top: -6px;
         z-index: -1;
         background-color: #e8cfa6;
