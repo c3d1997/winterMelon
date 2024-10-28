@@ -87,7 +87,7 @@ const options3 = [
 ];
 
 // 單選
-const selected = ref("");
+const selected = ref("1");
 
 const radioList = [
   { value: "1", label: "Cendol" },
