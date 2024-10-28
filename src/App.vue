@@ -56,7 +56,6 @@ const route = useRoute();
 
 .inputStyle {
   position: relative;
-
   &_Input {
     width: 100%;
     line-height: 38px;
@@ -156,6 +155,74 @@ const route = useRoute();
         display: block;
       }
     }
+  }
+}
+.popupBG {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 9;
+}
+.fenceCard {
+  position: relative;
+  z-index: 2;
+  margin: auto;
+  margin-bottom: 95px;
+  &_top {
+    background: url(/images/fenceBG_top.png) repeat-x;
+    height: 43px;
+    width: 100%;
+    background-size: auto 43px;
+  }
+  &_card {
+    position: relative;
+    background-color: $second-color;
+    padding: 0px 30px;
+    padding-bottom: 40px;
+    outline: 3px solid $main-color;
+    border-bottom: 6px solid $support-color;
+    @media (max-width: 335px) {
+      padding: 0px 20px;
+    }
+  }
+}
+.dataCardType1 {
+  color: $main-color;
+  position: relative;
+  z-index: 2;
+  border: 24px solid;
+  border-image: url(/images/border_02.png) stretch;
+  border-image-slice: 32 fill;
+  &::after {
+    content: "";
+    position: absolute;
+    width: calc(100% + 14px);
+    height: calc(100% + 14px);
+    left: -7px;
+    top: -7px;
+    z-index: -1;
+    background-color: #e8cfa6;
+  }
+}
+.dataCardType2 {
+  position: relative;
+  z-index: 1;
+  border: 24px solid;
+  border-image: url(/images/border_01.png) stretch;
+  border-image-slice: 34 fill;
+  background: transparent;
+  &::after {
+    content: "";
+    position: absolute;
+    width: calc(100% + 13px);
+    height: calc(100% + 12px);
+    left: -6.5px;
+    top: -6px;
+    z-index: -1;
+    background-color: #f3e5c2;
   }
 }
 </style>

@@ -39,16 +39,34 @@ const routes = [
     ],
   },
   {
-    path: "/QA",
+    path: "/qa",
     component: () =>
       import("@/views/pages/dataCollection/DataCollectionView.vue"),
     meta: { keep_live: false },
     children: [
       {
         path: "",
-        name: "QA",
+        name: "qa",
         component: () =>
           import("@/views/pages/dataCollection/DataCollectionQA.vue"),
+      },
+      {
+        path: "/introduce",
+        name: "introduce",
+        component: () =>
+          import("@/views/pages/dataCollection/DataCollectionIntroduce.vue"),
+      },
+      {
+        path: "/aboutUs",
+        name: "aboutUs",
+        component: () =>
+          import("@/views/pages/dataCollection/DataCollectionAboutUs.vue"),
+      },
+      {
+        path: "/reward",
+        name: "reward",
+        component: () =>
+          import("@/views/pages/dataCollection/DataCollectionReward.vue"),
       },
     ],
   },
