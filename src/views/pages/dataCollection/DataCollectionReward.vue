@@ -1,5 +1,5 @@
 <template>
-  <div class="popupBG" v-if="is_reward || is_confirm"></div>
+  <div class="popupBG" v-if="is_reward || is_confirm || is_re"></div>
   <div class="popup" v-if="is_reward">
     <div class="popup_card">
       <div class="popup_card-X" @click="closePop">
@@ -21,7 +21,20 @@
           Please leave this action to the clerk. Once the button is pressed, it
           cannot be redeemed again.
         </p>
-        <div class="redeemConfirm_img">
+        <div class="redeemConfirm_img" @click="handleRedeem">
+          <img src="/images/confirm.png" alt="" />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="popup" v-if="is_re">
+    <div class="popup_card redeemCard">
+      <div class="popup_card-X" @click="closePop">
+        <img src="/images/X.png" alt="" />
+      </div>
+      <div class="popup_card-content redeemConfirm">
+        <p>提醒確認重新開始</p>
+        <div class="redeemConfirm_img" @click="router.push('/game')">
           <img src="/images/confirm.png" alt="" />
         </div>
       </div>
@@ -86,7 +99,7 @@
             </div>
             <p>You Have Already Redeemed Your Reward</p>
             <p>Thank You for Playing!</p>
-            <div class="submitBtnRE" @click="confirmPop">
+            <div class="submitBtnRE" @click="rePop">
               <img src="/images/RE.png" alt="" />
             </div>
             <p>Play the Game Again</p>
@@ -108,7 +121,15 @@ import selectModel from "@/views/components/select.vue";
 const userStore = useUserStore();
 const router = useRouter();
 const route = useRoute();
-const is_reGame = ref(true);
+const is_reGame = ref(false);
+const is_re = ref(false);
+const handleRedeem = () => {
+  is_reGame.value = true;
+  is_confirm.value = false;
+};
+const rePop = () => {
+  is_re.value = true;
+};
 // 驗證碼驗證
 const error = ref({
   code: true,
@@ -150,6 +171,7 @@ const confirmPop = () => {
 const closePop = () => {
   is_reward.value = false;
   is_confirm.value = false;
+  is_re.value = false;
 };
 </script>
 

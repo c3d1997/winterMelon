@@ -8,6 +8,7 @@ export default defineConfig(({ command, mode }) => {
     plugins: [vue()],
     define: {
       __ENV__: JSON.stringify(env.VITE_ENV),
+      __API_URL__: JSON.stringify(env.VITE_API_URL),
     },
     resolve: {
       alias: {
@@ -15,6 +16,14 @@ export default defineConfig(({ command, mode }) => {
         vue: "vue/dist/vue.esm-bundler.js",
       },
     },
+    // server: {
+    //   proxy: {
+    //     "/api": {
+    //       target: "https://api-melon-stage.ginjack.shop",
+    //       changeOrigin: true,
+    //     },
+    //   },
+    // },
     css: {
       preprocessorOptions: {
         scss: {

@@ -27,7 +27,10 @@
         <div class="errorMessage">
           <p v-if="!error.phone">Enter a valid mobile number</p>
         </div>
-        <btnNormal content="Send Verification Code"></btnNormal>
+        <btnNormal
+          content="Send Verification Code"
+          @click="submitPhone"
+        ></btnNormal>
       </div>
       <!-- <div class="inputStyle" contenteditable="true" ref="phoneInputRef"></div> -->
 
@@ -47,7 +50,7 @@
       <div class="errorMessage">
         <p v-if="!error.code">Enter a valid verification code</p>
       </div>
-      <btnNormal content="LOGIN"></btnNormal>
+      <btnNormal content="LOGIN" @click="submitVerify"></btnNormal>
     </div>
   </div>
 </template>
@@ -57,6 +60,7 @@ import { ref, onMounted, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useUserStore } from "@/stores/userStore";
 import btnNormal from "@/views/components/btnNormal.vue";
+import { api_send_verify_code, verify_account, setCookies } from "@/utils/api";
 const userStore = useUserStore();
 const router = useRouter();
 const route = useRoute();
@@ -67,10 +71,12 @@ const error = ref({
 });
 // 手機驗證
 const phoneNumber = ref("");
+const phoneValue = ref("");
 const onInput = (number, phoneObject) => {
   // console.log("number:", number);
   // console.log("phoneObject:", phoneObject);
   console.log("手機號碼", phoneObject.number);
+  phoneValue.value = phoneObject.number;
 };
 
 const onValidate = (phoneObject) => {
@@ -102,6 +108,61 @@ const onCodeInput = () => {
     // 通過驗證
     console.log("通過");
     error.value.code = true;
+  }
+};
+
+// 收取驗證碼
+const isSubmitting = ref(false); //防抖動
+const submitPhone = async () => {
+  if (isSubmitting.value) return;
+  try {
+    isSubmitting.value = true;
+    console.log(phoneValue.value);
+    const data = {
+      phone: phoneValue.value,
+    };
+    const verify_result = await api_send_verify_code(data);
+    if (verify_result.status == "success") {
+      console.log("收取驗證碼成功");
+    } else if (verify_result.status == "error") {
+      console.log("收取驗證碼失敗");
+    }
+  } finally {
+    isSubmitting.value = false;
+  }
+};
+
+// 驗證驗證碼是否正確
+// 驗證是否有填寫
+const validateForm = () => {
+  if (phoneValue.value == undefined || phoneValue.value == "") {
+    error.value.phone = false;
+  }
+  if (codeNumber.value == "") {
+    error.value.code = false;
+  }
+  return error.value.phone && error.value.code;
+};
+const submitVerify = async () => {
+  console.log(phoneValue.value);
+  if (!validateForm()) {
+    return;
+  }
+  const data = {
+    code: codeNumber.value,
+    phone: phoneValue.value,
+  };
+  console.log(data);
+  const verifyAccount_result = await verify_account(data);
+  if (verifyAccount_result.status == "success") {
+    console.log("驗證成功");
+    await setCookies(
+      verifyAccount_result.payload.token,
+      verifyAccount_result.payload.exp
+    );
+    router.push("/registration/mbti");
+  } else if (verifyAccount_result.status == "error") {
+    console.log("驗證失敗");
   }
 };
 </script>

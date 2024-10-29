@@ -51,7 +51,7 @@
           </label>
         </div>
       </div>
-      <div class="submitBtn">
+      <div class="submitBtn" @click="router.push('/introduce')">
         <img src="/images/submit.png" alt="" />
       </div>
     </div>

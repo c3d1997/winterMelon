@@ -3,7 +3,7 @@
   <div class="popupBG" v-if="is_pop"></div>
   <div class="popup" v-if="is_pop">
     <div class="popup_card">
-      <div class="popup_card-X">
+      <div class="popup_card-X" @click="closePop">
         <img src="/images/X.png" alt="" />
       </div>
       <div class="popup_card-content">
@@ -30,7 +30,7 @@
           <span>2 / 15</span>
         </div>
         <div class="gameTop_mission-right">
-          <img src="/images/qa.png" alt="" />
+          <img @click="openPop" src="/images/qa.png" alt="" />
         </div>
       </div>
     </div>
@@ -50,7 +50,7 @@
         </div>
       </div>
       <div class="gameBottom_item">item</div>
-      <div class="gameBottom_btn">
+      <div class="gameBottom_btn" @click="router.push('/qa')">
         <img class="filterSet" src="/images/collect.png" alt="" />
         <p>00:00:00</p>
       </div>
@@ -80,6 +80,13 @@ const router = useRouter();
 const route = useRoute();
 
 const is_pop = ref(false);
+
+const openPop = () => {
+  is_pop.value = true;
+};
+const closePop = () => {
+  is_pop.value = false;
+};
 </script>
 
 <style lang="scss" scoped>

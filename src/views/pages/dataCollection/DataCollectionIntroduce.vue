@@ -31,7 +31,7 @@
           </p>
         </div>
       </div>
-      <div class="submitBtn">
+      <div class="submitBtn" @click="router.push('/aboutUs')">
         <img src="/images/reward.png" alt="" />
       </div>
     </div>

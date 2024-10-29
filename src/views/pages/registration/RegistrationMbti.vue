@@ -58,7 +58,9 @@
         </div>
       </div>
       <div class="mbtiCard_btn">
-        <div class="mbtiCard_btn-start"><p>START</p></div>
+        <div class="mbtiCard_btn-start" @click="router.push('/game')">
+          <p>START</p>
+        </div>
       </div>
     </div>
   </div>
@@ -70,10 +72,16 @@ import { useRouter, useRoute } from "vue-router";
 import { useUserStore } from "@/stores/userStore";
 import "vue3-carousel/dist/carousel.css";
 import { Carousel, Slide, Pagination, Navigation } from "vue3-carousel";
+import { get_member_info } from "@/utils/api";
 const userStore = useUserStore();
 const router = useRouter();
 const route = useRoute();
-
+onMounted(async () => {
+  const memberInfo = await get_member_info();
+  console.log(memberInfo);
+  userStore.user = memberInfo.payload.data;
+  console.log(userStore.user);
+});
 // 輪播數字控制
 const currentIndex = ref(0);
 const updateIndex = (slide) => {
@@ -85,47 +93,58 @@ const mbtiTypes = [
   {
     title: "Extroverted Winter Melon",
     type: "(E type)",
+    key: "E",
     description:
       "Loves sunlight and requires more external stimuli, such as heavy rain to promote growth.",
   },
   {
     title: "Introverted Winter Melon",
     type: "(I type)",
+
+    key: "I",
     description: "Grows slowly and needs more care and a stable environment.",
   },
   {
     title: "Sensing Winter Melon",
     type: "(S type)",
+
+    key: "S",
     description:
       "Enjoys routine and particularly needs regular watering and fertilization.",
   },
   {
     title: "Intuitive Winter Melon",
     type: "(M type)",
+
+    key: "M",
     description:
       "May develop unexpected traits, such as unique shapes or colors.",
   },
   {
     title: "Thinking Winter Melon",
     type: "(T type)",
+    key: "T",
     description:
       "Responds sensitively to environmental changes, and over-caring may have negative effects.",
   },
   {
     title: "Feeling Winter Melon",
     type: "(F type)",
+    key: "F",
     description:
       "Requires more interaction and love from players for healthy growth.",
   },
   {
     title: "Judging Winter Melon",
     type: "(J type)",
+    key: "J",
     description:
       "Very orderly, grows quickly if players complete care tasks on time.",
   },
   {
     title: "Perceiving Winter Melon",
     type: "(P type)",
+    key: "P",
     description:
       "Thrives better in a changing environment, and random events serve as growth catalysts.",
   },
