@@ -58,7 +58,7 @@
         </div>
       </div>
       <div class="mbtiCard_btn">
-        <div class="mbtiCard_btn-start" @click="router.push('/game')">
+        <div @click="submitStart" class="mbtiCard_btn-start">
           <p>START</p>
         </div>
       </div>
@@ -72,7 +72,7 @@ import { useRouter, useRoute } from "vue-router";
 import { useUserStore } from "@/stores/userStore";
 import "vue3-carousel/dist/carousel.css";
 import { Carousel, Slide, Pagination, Navigation } from "vue3-carousel";
-import { get_member_info } from "@/utils/api";
+import { get_member_info, set_mbti } from "@/utils/api";
 const userStore = useUserStore();
 const router = useRouter();
 const route = useRoute();
@@ -84,11 +84,16 @@ onMounted(async () => {
 });
 // 輪播數字控制
 const currentIndex = ref(0);
+// 人格預設E
+const currentSlide = ref("E");
 const updateIndex = (slide) => {
-  console.log(slide);
+  console.log("slide", slide);
   currentIndex.value = slide.slidingToIndex;
+  // 控制選到哪個人格
+  currentSlide.value = mbtiTypes[slide.slidingToIndex].key;
+  console.log("currentSlide", currentSlide.value);
 };
-
+// 人格內容
 const mbtiTypes = [
   {
     title: "Extroverted Winter Melon",
@@ -100,14 +105,12 @@ const mbtiTypes = [
   {
     title: "Introverted Winter Melon",
     type: "(I type)",
-
     key: "I",
     description: "Grows slowly and needs more care and a stable environment.",
   },
   {
     title: "Sensing Winter Melon",
     type: "(S type)",
-
     key: "S",
     description:
       "Enjoys routine and particularly needs regular watering and fertilization.",
@@ -115,7 +118,6 @@ const mbtiTypes = [
   {
     title: "Intuitive Winter Melon",
     type: "(M type)",
-
     key: "M",
     description:
       "May develop unexpected traits, such as unique shapes or colors.",
@@ -149,6 +151,21 @@ const mbtiTypes = [
       "Thrives better in a changing environment, and random events serve as growth catalysts.",
   },
 ];
+
+const submitStart = async () => {
+  const mbitData = {
+    mbti: currentSlide.value,
+  };
+  console.log("mbitData", mbitData);
+  const mbtiResult = await set_mbti(mbitData);
+  if (mbtiResult.status == "success") {
+    console.log("設定mbti成功");
+
+    router.push("/game");
+  } else if (mbtiResult.status == "error") {
+    console.log("設定mbti錯誤");
+  }
+};
 </script>
 
 <style lang="scss" scoped>

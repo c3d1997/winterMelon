@@ -110,3 +110,32 @@ export async function get_member_info() {
     return error.response.data;
   }
 }
+// 使用者增加收集物
+export async function get_collection() {
+  try {
+    const headers = createAuthHeaders();
+    const response = await axios.get(`${proxy_api_url}/api/v1/get_collection`, {
+      headers,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error get_collection:", error);
+    return error.response.data;
+  }
+}
+// 使用者完成第一次任務
+export async function completed_first_task() {
+  try {
+    const headers = createAuthHeaders();
+    const response = await axios.get(
+      `${proxy_api_url}/api/v1/completed_first_task`,
+      {
+        headers,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error completed_first_task:", error);
+    return error.response.data;
+  }
+}

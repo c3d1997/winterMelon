@@ -36,6 +36,16 @@ const routes = [
         name: "game",
         component: () => import("@/views/pages/game/GamePlay.vue"),
       },
+      {
+        path: "melonRun",
+        name: "melonRun",
+        component: () => import("@/views/pages/game/GameRun.vue"),
+      },
+      {
+        path: "melonCamera",
+        name: "melonCamera",
+        component: () => import("@/views/pages/game/GameCamera.vue"),
+      },
     ],
   },
   {

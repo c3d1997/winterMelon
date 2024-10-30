@@ -3,7 +3,7 @@
   <div class="popupBG" v-if="is_pop"></div>
   <div class="popup" v-if="is_pop">
     <div class="popup_card">
-      <div class="popup_card-X" @click="closePop">
+      <div class="popup_card-X">
         <img src="/images/X.png" alt="" />
       </div>
       <div class="popup_card-content">
@@ -30,7 +30,7 @@
           <span>2 / 15</span>
         </div>
         <div class="gameTop_mission-right">
-          <img @click="openPop" src="/images/qa.png" alt="" />
+          <img src="/images/qa.png" alt="" />
         </div>
       </div>
     </div>
@@ -50,7 +50,7 @@
         </div>
       </div>
       <div class="gameBottom_item">item</div>
-      <div class="gameBottom_btn" @click="router.push('/qa')">
+      <div class="gameBottom_btn" @click="getCollection">
         <img class="filterSet" src="/images/collect.png" alt="" />
         <p>00:00:00</p>
       </div>
@@ -75,17 +75,24 @@
 import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useUserStore } from "@/stores/userStore";
+import {
+  get_member_info,
+  get_collection,
+  completed_first_task,
+} from "@/utils/api";
 const userStore = useUserStore();
 const router = useRouter();
 const route = useRoute();
+onMounted(async () => {
+  const memberInfo = await get_member_info();
+  console.log(memberInfo);
+  userStore.user = memberInfo.payload.data;
+  console.log(userStore.user);
+});
 
-const is_pop = ref(false);
-
-const openPop = () => {
-  is_pop.value = true;
-};
-const closePop = () => {
-  is_pop.value = false;
+const getCollection = async () => {
+  const collection = await get_collection();
+  console.log(collection);
 };
 </script>
 
@@ -362,14 +369,5 @@ const closePop = () => {
 }
 .filterSet {
   filter: brightness(0.8) contrast(0.7);
-}
-.popupBG {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  z-index: 9;
 }
 </style>
