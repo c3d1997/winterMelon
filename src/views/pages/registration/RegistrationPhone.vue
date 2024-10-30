@@ -50,7 +50,10 @@
       <div class="errorMessage">
         <p v-if="!error.code">Enter a valid verification code</p>
       </div>
-      <btnNormal content="LOGIN" @click="submitVerify"></btnNormal>
+      <btnNormal
+        content="LOGIN"
+        @click="router.push('registration/mbti')"
+      ></btnNormal>
     </div>
   </div>
 </template>
@@ -60,7 +63,7 @@ import { ref, onMounted, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useUserStore } from "@/stores/userStore";
 import btnNormal from "@/views/components/btnNormal.vue";
-import { api_send_verify_code, verify_account, setCookies } from "@/utils/api";
+// import { api_send_verify_code, verify_account, setCookies } from "@/utils/api";
 const userStore = useUserStore();
 const router = useRouter();
 const route = useRoute();

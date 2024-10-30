@@ -58,7 +58,7 @@
         </div>
       </div>
       <div class="mbtiCard_btn">
-        <div @click="submitStart" class="mbtiCard_btn-start">
+        <div @click="router.push('/game')" class="mbtiCard_btn-start">
           <p>START</p>
         </div>
       </div>
@@ -72,16 +72,16 @@ import { useRouter, useRoute } from "vue-router";
 import { useUserStore } from "@/stores/userStore";
 import "vue3-carousel/dist/carousel.css";
 import { Carousel, Slide, Pagination, Navigation } from "vue3-carousel";
-import { get_member_info, set_mbti } from "@/utils/api";
+// import { get_member_info, set_mbti } from "@/utils/api";
 const userStore = useUserStore();
 const router = useRouter();
 const route = useRoute();
-onMounted(async () => {
-  const memberInfo = await get_member_info();
-  console.log(memberInfo);
-  userStore.user = memberInfo.payload.data;
-  console.log(userStore.user);
-});
+// onMounted(async () => {
+//   const memberInfo = await get_member_info();
+//   console.log(memberInfo);
+//   userStore.user = memberInfo.payload.data;
+//   console.log(userStore.user);
+// });
 // 輪播數字控制
 const currentIndex = ref(0);
 // 人格預設E

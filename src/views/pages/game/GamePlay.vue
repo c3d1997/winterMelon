@@ -68,7 +68,7 @@
       <div class="gameBottom_btn" @click="collectPop">
         <img
           :class="{ filterSet: is_filter }"
-          src="/images/collect.png"
+          :src="`/images/${is_collectFinish ? 'winning' : 'collect'}.png`"
           alt=""
         />
         <p v-if="is_filter">00:00:00</p>
@@ -104,11 +104,11 @@
 import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useUserStore } from "@/stores/userStore";
-import {
-  get_member_info,
-  get_collection,
-  completed_first_task,
-} from "@/utils/api";
+// import {
+//   get_member_info,
+//   get_collection,
+//   completed_first_task,
+// } from "@/utils/api";
 const userStore = useUserStore();
 const router = useRouter();
 const route = useRoute();
@@ -156,13 +156,13 @@ const generateRandomPosition = () => {
   };
 };
 
-onMounted(async () => {
-  generateRandomPosition();
-  const memberInfo = await get_member_info();
-  console.log(memberInfo);
-  userStore.user = memberInfo.payload.data;
-  console.log(userStore.user);
-});
+// onMounted(async () => {
+//   generateRandomPosition();
+//   const memberInfo = await get_member_info();
+//   console.log(memberInfo);
+//   userStore.user = memberInfo.payload.data;
+//   console.log(userStore.user);
+// });
 
 const collectPop = async () => {
   is_collect.value = true;
@@ -170,6 +170,8 @@ const collectPop = async () => {
   // console.log(collection);
 };
 
+// 收集完成
+const is_collectFinish = ref(false);
 const submitCollect = () => {
   is_collect.value = false;
 };
