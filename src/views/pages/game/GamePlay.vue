@@ -165,7 +165,11 @@ const generateRandomPosition = () => {
 // });
 
 const collectPop = async () => {
-  is_collect.value = true;
+  if (is_collectFinish.value == true) {
+    router.push("qa");
+  } else {
+    is_collect.value = true;
+  }
   // const collection = await get_collection();
   // console.log(collection);
 };
@@ -174,6 +178,7 @@ const collectPop = async () => {
 const is_collectFinish = ref(false);
 const submitCollect = () => {
   is_collect.value = false;
+  is_collectFinish.value = true;
 };
 </script>
 

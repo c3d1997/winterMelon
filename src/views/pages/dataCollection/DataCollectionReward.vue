@@ -34,7 +34,10 @@
       </div>
       <div class="popup_card-content redeemConfirm">
         <p>提醒確認重新開始</p>
-        <div class="redeemConfirm_img" @click="router.push('/game')">
+        <div
+          class="redeemConfirm_img"
+          @click="router.push('/registration/mbti')"
+        >
           <img src="/images/confirm.png" alt="" />
         </div>
       </div>
