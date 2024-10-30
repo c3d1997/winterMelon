@@ -2853,7 +2853,7 @@ var i = i || {};
         this.ZР.dΜ.Y8 = true;
         this.ZР.dΜ.Τi = false;
       }
-      // 在這裡添加 postMessage
+      //  postMessage
       window.parent.postMessage(
         {
           type: "gameOver",

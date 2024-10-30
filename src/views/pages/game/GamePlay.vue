@@ -1,9 +1,9 @@
 <template>
   <div class="gameBG"></div>
-  <div class="popupBG" v-if="is_pop"></div>
+  <div class="popupBG" v-if="is_pop || is_collect"></div>
   <div class="popup" v-if="is_pop">
     <div class="popup_card">
-      <div class="popup_card-X">
+      <div class="popup_card-X" @click="closePop">
         <img src="/images/X.png" alt="" />
       </div>
       <div class="popup_card-content">
@@ -16,26 +16,41 @@
       </div>
     </div>
   </div>
+  <div class="popup" v-if="is_collect">
+    <div class="collect">
+      <p>You Got the Item</p>
+      <div class="collect_object">
+        <img src="/images/collectEX.png" alt="" />
+      </div>
+      <span>watering machine</span>
+      <div class="collect_btn" @click="submitCollect">
+        <img src="/images/ok.png" alt="" />
+      </div>
+    </div>
+  </div>
   <div class="game">
     <div class="gameTop">
       <div>
         <div class="gameTop_profile">
-          <img src="/images/profile.png" alt="" />
+          <img src="/images/profileHead.png" alt="" />
         </div>
         <div class="gameTop_name">Seed State</div>
       </div>
       <div class="gameTop_mission">
         <div class="gameTop_mission-left">
           <p>MISSION</p>
-          <span>2 / 15</span>
+          <span>0 / 4</span>
         </div>
         <div class="gameTop_mission-right">
-          <img src="/images/qa.png" alt="" />
+          <img @click="is_pop = true" src="/images/qa.png" alt="" />
         </div>
       </div>
     </div>
     <div class="gameMid">
       <img src="/images/profile.png" alt="" />
+      <div class="gameMid_collect" :style="randomPosition">
+        <img src="/images/collectEX.png" alt="" />
+      </div>
     </div>
     <div class="gameBottom">
       <div class="gameBottom_box">
@@ -50,20 +65,34 @@
         </div>
       </div>
       <div class="gameBottom_item">item</div>
-      <div class="gameBottom_btn" @click="getCollection">
-        <img class="filterSet" src="/images/collect.png" alt="" />
-        <p>00:00:00</p>
+      <div class="gameBottom_btn" @click="collectPop">
+        <img
+          :class="{ filterSet: is_filter }"
+          src="/images/collect.png"
+          alt=""
+        />
+        <p v-if="is_filter">00:00:00</p>
       </div>
 
       <div class="gameBottom_gameStyle">
         <div class="gameBottom_game">
           <div class="gameBottom_game-set">
-            <img class="filterSet" src="/images/game1.png" alt="" />
-            <p>00:00:00</p>
+            <img
+              @click="router.push('game/melonRun')"
+              :class="{ filterSet: is_filter }"
+              src="/images/game1.png"
+              alt=""
+            />
+            <p v-if="is_filter">00:00:00</p>
           </div>
           <div class="gameBottom_game-set">
-            <img class="filterSet" src="/images/game2.png" alt="" />
-            <p>00:00:00</p>
+            <img
+              @click="router.push('game/melonCamera')"
+              :class="{ filterSet: is_filter }"
+              src="/images/game2.png"
+              alt=""
+            />
+            <p v-if="is_filter">00:00:00</p>
           </div>
         </div>
       </div>
@@ -83,16 +112,66 @@ import {
 const userStore = useUserStore();
 const router = useRouter();
 const route = useRoute();
+const is_filter = ref(false);
+const is_pop = ref(true);
+const is_collect = ref(false);
+const closePop = () => {
+  is_pop.value = false;
+};
+// 計算隨機位置
+const randomPosition = ref({
+  top: "0px",
+  left: "0px",
+});
+
+// 生成隨機位置函數
+const generateRandomPosition = () => {
+  // 決定要生成負值還是高於50%的值
+  const isNegativeTop = Math.random() < 0.5;
+  const isNegativeLeft = Math.random() < 0.5;
+
+  let randomTop, randomLeft;
+
+  // 生成 top 值
+  if (isNegativeTop) {
+    // 生成 -100% 到 0% 的值
+    randomTop = Math.floor(Math.random() * 100) * -1;
+  } else {
+    // 生成 50% 到 100% 的值
+    randomTop = Math.floor(Math.random() * 50) + 50;
+  }
+
+  // 生成 left 值 (-50% 到 0% 或 50% 到 80%)
+  if (isNegativeLeft) {
+    // 生成 -50% 到 0% 的值
+    randomLeft = Math.floor(Math.random() * 50) * -1;
+  } else {
+    // 生成 50% 到 80% 的值
+    randomLeft = Math.floor(Math.random() * 30) + 50; // 30 = 80 - 50
+  }
+
+  randomPosition.value = {
+    top: `${randomTop}%`,
+    left: `${randomLeft}%`,
+  };
+};
+
 onMounted(async () => {
+  generateRandomPosition();
   const memberInfo = await get_member_info();
   console.log(memberInfo);
   userStore.user = memberInfo.payload.data;
   console.log(userStore.user);
 });
 
-const getCollection = async () => {
-  const collection = await get_collection();
-  console.log(collection);
+const collectPop = async () => {
+  is_collect.value = true;
+  // const collection = await get_collection();
+  // console.log(collection);
+};
+
+const submitCollect = () => {
+  is_collect.value = false;
 };
 </script>
 
@@ -128,12 +207,15 @@ const getCollection = async () => {
   gap: 8px;
   &_profile {
     position: relative;
-    width: 120px;
-    height: 120px;
+    max-width: 120px;
+    max-height: 120px;
     border: 25px solid;
     border-image: url(/images/border_01.png) stretch;
     border-image-slice: 34 fill;
+    display: flex;
+    align-items: center;
     img {
+      height: 100%;
       width: 100%;
     }
     &::after {
@@ -203,6 +285,7 @@ const getCollection = async () => {
         width: 100%;
       }
     }
+
     &::after {
       content: "";
       position: absolute;
@@ -221,8 +304,18 @@ const getCollection = async () => {
   top: calc(50dvh - 75px);
   left: calc(50% - 75px);
   width: 150px;
+  position: relative;
+  z-index: 2;
   img {
     width: 100%;
+  }
+  &_collect {
+    position: absolute;
+    z-index: -1;
+    width: 80px;
+    img {
+      width: 100%;
+    }
   }
 }
 .gameBottom {
@@ -369,5 +462,34 @@ const getCollection = async () => {
 }
 .filterSet {
   filter: brightness(0.8) contrast(0.7);
+}
+.collect {
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  p {
+    font-size: 18px;
+    margin-bottom: 14px;
+  }
+  span {
+    display: block;
+    font-size: 25px;
+    margin-top: 12px;
+  }
+  &_object {
+    width: 120px;
+    img {
+      width: 100%;
+    }
+  }
+  &_btn {
+    width: 150px;
+    margin-top: 30px;
+    img {
+      width: 100%;
+    }
+  }
 }
 </style>
