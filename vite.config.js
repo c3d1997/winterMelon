@@ -16,6 +16,7 @@ export default defineConfig(({ command, mode }) => {
         vue: "vue/dist/vue.esm-bundler.js",
       },
     },
+    base: "/winterMelon/",
     // server: {
     //   proxy: {
     //     "/api": {
