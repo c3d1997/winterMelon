@@ -83,7 +83,7 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHashHistory("/winterMelon/"),
+  history: createWebHistory(),
   base: "/",
   routes,
   scrollBehavior(to, from, savedPosition) {
