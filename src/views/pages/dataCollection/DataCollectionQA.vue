@@ -45,8 +45,6 @@
               請選擇購買頻率
             </div>
           </div>
-
-          <div>{{ region + " / " + state + " / " + district }}</div>
           <div class="qa_selects-group">
             <selectModel
               v-model="region"
@@ -417,7 +415,9 @@ const submitIntroduce = async () => {
   console.log(selectedValue1.value);
   console.log(selectedValue2.value);
   console.log(selectedValue3.value);
+  console.log(region.value);
   console.log(state.value);
+  console.log(district.value);
   console.log(selected.value);
 };
 </script>

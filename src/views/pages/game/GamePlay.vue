@@ -205,8 +205,7 @@ const submitCollect = async () => {
       }
     } else if (
       userStore.user.melon_info.melon_status == 1 ||
-      userStore.user.melon_info.melon_status == 2 ||
-      userStore.user.melon_info.melon_status == 3
+      userStore.user.melon_info.melon_status == 2
     ) {
       console.log("使用者收集物品");
       const normalCollectionResult = await get_collection();
