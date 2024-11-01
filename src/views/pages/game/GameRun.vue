@@ -12,7 +12,11 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
-
+import { useRouter, useRoute } from "vue-router";
+import { useUserStore } from "@/stores/userStore";
+const userStore = useUserStore();
+const router = useRouter();
+const route = useRoute();
 const gameFrame = ref(null);
 const gameScore = ref(0);
 // 處理遊戲消息
@@ -26,6 +30,9 @@ const handleGameMessage = (event) => {
       // 這裡可以處理遊戲結束後的邏輯
       console.log("遊戲結束，分數：", data.score);
       console.log("最高分：", data.bestScore);
+      break;
+    case "copyUrl":
+      console.log("複製網址");
       break;
   }
 };

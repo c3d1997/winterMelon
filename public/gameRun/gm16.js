@@ -223,7 +223,12 @@ function init() {
   gldt = 0;
   e = navigator.language;
   -1 < document.URL.indexOf("page")
-    ? ((e = ["title_3d_nolink.jpg", "bg.jpg", "end_3d_nolink.jpg", "en.png"]),
+    ? ((e = [
+        "title_3d_nolink.jpg",
+        "bg.jpg",
+        ["end_3d_nolink.jpg", "end_low.jpg"],
+        "en.png",
+      ]),
       (canvas.style.backgroundImage = "url(ber/title_3d_nolink.jpg)"),
       (shms1 = "Browser game[Look Bear,Run!] SCORE="),
       (shms2 = "Browser game[Look Bear,Run!]"),
@@ -232,13 +237,18 @@ function init() {
       (shms4 =
         "Why don't you get useful items by sharing this game to your friends?"))
     : -1 < e.indexOf("ja")
-    ? ((e = ["title_3d.jpg", "bg.jpg", "end_3d.jpg", "cs_3d.png"]),
+    ? ((e = [
+        "title_3d.jpg",
+        "bg.jpg",
+        ["end_3d.jpg", "end_low.jpg"],
+        "cs_3d.png",
+      ]),
       (canvas.style.backgroundImage = "url(ber/title_3d.jpg)"),
       (shms1 = "??????V???u???E?U?Q?[???u????I????????v SCORE="),
       (shms2 = "??????V???u???E?U?Q?[???u????I????????v"),
       (shms3 = "?F?B?????Q?[?????V?F?A???¨!A????TIPS???Q?b?g???o?I"),
       (shms4 = "?F?B?????Q?[?????V?F?A???¨!A?A?C?e?????Q?b?g???o?I"))
-    : ((e = ["titl.jpg", "bg.jpg", "end.jpg", "en.png"]),
+    : ((e = ["titl.jpg", "bg.jpg", ["end.jpg", "end_low.jpg"], "en.png"]),
       (canvas.style.backgroundImage = "url(ber/titl.jpg)"),
       (canvas.style.backgroundSize = "cover"),
       (shms1 = "Browser game[Look Bear,Run!] SCORE="),
@@ -258,8 +268,13 @@ function init() {
     gsts();
   };
   img2 = new Image();
-  img2.src = "ber/" + e[2];
+  img2.src = "ber/" + e[2][0]; // 高分結算圖
   img2.onload = function () {
+    gsts();
+  };
+  img3 = new Image();
+  img3.src = "ber/" + e[2][1]; // 低分結算圖
+  img3.onload = function () {
     gsts();
   };
   img7 = new Image();
@@ -785,8 +800,17 @@ function Press(e) {
       break;
     case 2: // 結束畫面
       if (175 < t && 365 < n) {
-        console.log("結束畫面：跳轉到主頁");
-        window.location.href = HOME_PATH;
+        console.log("分享遊戲：複製網址");
+        window.parent.postMessage(
+          {
+            type: "copyUrl",
+            // data: {
+            //   score: scr,
+            //   bestScore: bstscr,
+            // },
+          },
+          "*"
+        );
       } else if (35 < t && 180 < n && t < 155 && n < 225) {
         console.log("結束畫面：重新開始遊戲");
         scr = 0;
@@ -794,15 +818,25 @@ function Press(e) {
         s = 1;
         d; // 注意：這裡的 d 可能是一個未定義的變量，可能需要檢查
       } else if (168 < t && 180 < n && t < 286 && n < 225) {
-        console.log("結束畫面：顯示分享界面");
-        setTimeout(function () {
-          show_share();
-        }, 500);
+        console.log("結束畫面", "scr:", scr);
+        if (scr >= 500) {
+          // postMessage
+          console.log("scr", scr);
+
+          window.parent.postMessage(
+            {
+              type: "gameOver",
+              data: {
+                score: scr,
+                bestScore: bstscr,
+              },
+            },
+            "*"
+          );
+        }
       }
       break;
   }
-
-  // ... 其他代碼 ...
 }
 function tev22(e) {
   mousePos = { x: e.layerX, y: e.layerY };
@@ -1687,17 +1721,6 @@ function lp() {
       (bcv2.drawImage(ctx.canvas, 0, 0, 320, 416, 0, 0, 320, 416),
       (ogm = 1),
       (scr |= 0),
-      // postMessage
-      window.parent.postMessage(
-        {
-          type: "gameOver",
-          data: {
-            score: scr,
-            bestScore: bstscr,
-          },
-        },
-        "*"
-      ),
       999999 == bstscr &&
         ((e = new Date()),
         e.setDate(e.getDate() + 730),
@@ -1725,7 +1748,17 @@ function lp() {
         : (60 > ogm
             ? ((f = (ogm - 50) / 30), 1 < f && (f = 1))
             : (0 == gmovcl && (gmovcl = 1),
-              ctx.drawImage(img2, 0, 0, 320, 416, 0, 0, 320, 416),
+              ctx.drawImage(
+                scr >= 500 ? img2 : img3,
+                0,
+                0,
+                320,
+                416,
+                0,
+                0,
+                320,
+                416
+              ),
               scs2(99, String(scr).length, scr),
               bstscr == scr && spt2(150, 76, 103),
               1 == gtips && spt2(152, 79, 309),

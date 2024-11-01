@@ -115,41 +115,33 @@ const route = useRoute();
 const is_filter = ref(false);
 const is_pop = ref(true);
 const is_collect = ref(false);
+// 防抖狀態
+const isSubmitting = ref(false);
 const closePop = () => {
   is_pop.value = false;
 };
+
 // 計算隨機位置
 const randomPosition = ref({
   top: "0px",
   left: "0px",
 });
 
-// 生成隨機位置函數
+// 生成隨機位置
 const generateRandomPosition = () => {
-  // 決定要生成負值還是高於50%的值
   const isNegativeTop = Math.random() < 0.5;
   const isNegativeLeft = Math.random() < 0.5;
-
   let randomTop, randomLeft;
-
-  // 生成 top 值
   if (isNegativeTop) {
-    // 生成 -100% 到 0% 的值
     randomTop = Math.floor(Math.random() * 100) * -1;
   } else {
-    // 生成 50% 到 100% 的值
     randomTop = Math.floor(Math.random() * 50) + 50;
   }
-
-  // 生成 left 值 (-50% 到 0% 或 50% 到 80%)
   if (isNegativeLeft) {
-    // 生成 -50% 到 0% 的值
     randomLeft = Math.floor(Math.random() * 50) * -1;
   } else {
-    // 生成 50% 到 80% 的值
-    randomLeft = Math.floor(Math.random() * 30) + 50; // 30 = 80 - 50
+    randomLeft = Math.floor(Math.random() * 30) + 50;
   }
-
   randomPosition.value = {
     top: `${randomTop}%`,
     left: `${randomLeft}%`,
@@ -166,12 +158,38 @@ onMounted(async () => {
 
 const collectPop = async () => {
   is_collect.value = true;
-  // const collection = await get_collection();
-  // console.log(collection);
 };
-
-const submitCollect = () => {
-  is_collect.value = false;
+// 蒐集
+const submitCollect = async () => {
+  if (isSubmitting.value) return;
+  try {
+    isSubmitting.value = true;
+    if (userStore.user.melon_info.melon_status == 0) {
+      console.log("進入第一次回報");
+      const firstCollectionResult = await completed_first_task();
+      if (firstCollectionResult.status == "success") {
+        console.log("第一次回報成功");
+        const memberInfo = await get_member_info();
+        userStore.user = memberInfo.payload.data;
+        is_collect.value = false;
+      } else if (firstCollectionResult.status == "error") {
+        console.log("第一次回報失敗");
+      }
+    } else if (userStore.user.melon_info.melon_status == 1) {
+      console.log("使用者收集物品");
+      const normalCollectionResult = await get_collection();
+      if (normalCollectionResult.status == "success") {
+        console.log("收集物品成功");
+        const memberInfo = await get_member_info();
+        userStore.user = memberInfo.payload.data;
+        is_collect.value = false;
+      } else if (normalCollectionResult.status == "error") {
+        console.log("收集物品失敗");
+      }
+    }
+  } finally {
+    isSubmitting.value = false;
+  }
 };
 </script>
 

@@ -2580,6 +2580,34 @@ var p = [
     id: "share-icon",
     src: "res/share-icon.jpg",
   },
+  {
+    id: "start-btn",
+    src: "res/start.png",
+  },
+  {
+    id: "keep-btn",
+    src: "res/keep.png",
+  },
+  {
+    id: "restart-btn",
+    src: "res/playAgain.png",
+  },
+  {
+    id: "finish-btn",
+    src: "res/finish.png",
+  },
+  {
+    id: "finish-btn",
+    src: "res/finish.png",
+  },
+  {
+    id: "share-btn",
+    src: "res/share.png",
+  },
+  {
+    id: "title-img",
+    src: "res/congratulations.png",
+  },
 ];
 (function () {
   Ι.ІϺ("camera", "res/camera.mp3");
@@ -3306,14 +3334,10 @@ var A = Best.hg.extend({
     this.height = С.height;
   },
   Аp: function () {
-    var j = "开 始 摄";
-    var Е = 40;
+    var btnImg = ResourcePool.get("start-btn");
     var Κ = t.ІJ(280, 100, 30, "rgba(255,255,255,0.6)");
     var w = Κ.getContext("2d");
-    w.font = Е + "px Heiti";
-    w.fillStyle = "rgba(0,0,0,1)";
-    var q = w.measureText(j);
-    w.fillText(j, (Κ.width - q.width) >> 1, (Κ.height + Е) >> 1);
+    w.drawImage(btnImg, 0, 0, Κ.width, Κ.height);
     this.Κe = Κ;
     return Κ;
   },
@@ -3485,18 +3509,31 @@ var Н = Best.hg.extend({
     this.Qi += Ρ;
     V.fillStyle = "rgba(0,0,0,0.6)";
     V.fillRect(0, 0, this.width, this.height);
+
+    // 计算放大后的尺寸
+    var scale = 1.3; // 放大倍数,可以调整
+    var newWidth = this.ΙY.width * scale;
+    var newHeight = this.ΙY.height * scale;
+
+    // 居中绘制放大后的图片
     V.drawImage(
       this.ΙY,
-      (this.width - this.ΙY.width) >> 1,
-      (this.height - this.ΙY.height - 140) >> 1
+      (this.width - newWidth) >> 1, // 水平居中
+      (this.height - newHeight - 100) >> 1, // 垂直居中
+      newWidth, // 放大后的宽度
+      newHeight // 放大后的高度
     );
-    var Α = ">> 点击继续 <<";
-    var Ε = 40;
-    V.font = Ε + "px Heiti";
-    V.fillStyle = "#cccccc";
-    var Е = V.measureText(Α);
-    V.globalAlpha = 0.7 + Math.sin(O / 400) * 0.3;
-    V.fillText(Α, (this.width - Е.width) >> 1, this.height - 90);
+
+    const keepImg = ResourcePool.get("keep-btn");
+
+    V.drawImage(
+      keepImg,
+      (this.width - keepImg.width) >> 1, // 水平置中
+      this.height - 180, // 垂直位置
+      keepImg.width,
+      keepImg.height
+    );
+
     V.globalAlpha = 1;
   },
   ar: function (Y, u) {
@@ -3561,57 +3598,95 @@ var M = Best.hg.extend({
     this.ng = M.ng;
   },
   hA: function () {
+    // 重新開始按鈕
     if (!M.cΑ) {
-      // 原有的"重新開始"按钮代码
-      var w = "重新開始";
-      var Η = 40;
-      var m = (M.cΑ = t.ІJ(280, 100, 30, "rgba(255,255,255,0.8)"));
+      const restartImg = ResourcePool.get("restart-btn");
+      const scale = 0.5;
+      const btnWidth = restartImg.width * scale;
+      const btnHeight = restartImg.height * scale;
+
+      var m = (M.cΑ = t.ІJ(btnWidth, btnHeight, 30));
       var Κ = m.getContext("2d");
-      Κ.font = Η + "px Heiti";
-      Κ.fillStyle = "rgba(0,0,0,1)";
-      var a = Κ.measureText(w);
-      Κ.fillText(w, (m.width - a.width) >> 1, (m.height + Η) >> 1);
+      Κ.drawImage(restartImg, 0, 0, btnWidth, btnHeight);
     }
     this.cΑ = M.cΑ;
 
-    // 添加"前往連結"按钮
+    // 前往連結按鈕
     if (!M.linkButton) {
-      var linkText = "前往連結";
-      var linkButton = (M.linkButton = t.ІJ(
-        280,
-        100,
-        30,
-        "rgba(255,255,255,0.8)"
-      ));
+      const linkImg = ResourcePool.get("finish-btn");
+      const scale = 0.5;
+      const btnWidth = linkImg.width * scale;
+      const btnHeight = linkImg.height * scale;
+
+      var linkButton = (M.linkButton = t.ІJ(btnWidth, btnHeight, 30));
       var linkCtx = linkButton.getContext("2d");
-      linkCtx.font = "40px Heiti";
-      linkCtx.fillStyle = "rgba(0,0,0,1)";
-      var linkTextWidth = linkCtx.measureText(linkText).width;
-      linkCtx.fillText(
-        linkText,
-        (linkButton.width - linkTextWidth) >> 1,
-        (linkButton.height + 40) >> 1
-      );
+      linkCtx.drawImage(linkImg, 0, 0, btnWidth, btnHeight);
     }
     this.linkButton = M.linkButton;
+
+    // 添加新的分享按鈕
+    if (!M.shareButton) {
+      const shareImg = ResourcePool.get("share-btn");
+      const scale = 0.5;
+      const btnWidth = shareImg.width * scale;
+      const btnHeight = shareImg.height * scale;
+
+      var shareButton = (M.shareButton = t.ІJ(btnWidth, btnHeight, 30));
+      var shareCtx = shareButton.getContext("2d");
+      shareCtx.drawImage(shareImg, 0, 0, btnWidth, btnHeight);
+    }
+    this.shareButton = M.shareButton;
+
+    // 添加裝飾圖案
+    if (!M.decoration) {
+      const decoImg = ResourcePool.get("title-img");
+      const scale = 0.5;
+      const imgWidth = decoImg.width * scale;
+      const imgHeight = decoImg.height * scale;
+
+      var decoration = (M.decoration = t.ІJ(imgWidth, imgHeight, 0));
+      var decoCtx = decoration.getContext("2d");
+      decoCtx.drawImage(decoImg, 0, 0, imgWidth, imgHeight);
+    }
+    this.decoration = M.decoration;
   },
+
   resize: function () {
-    // 原有的代码
     this.width = С.width;
     this.height = С.height;
     this.BΜ = this.width;
     this.Pz = (this.ΑV.height * this.width) / this.ΑV.width;
+
+    // 計算按鈕位置
+    const spacing = 40; // 按鈕之間的間距
+    const btnY = this.height - 500; // 共同的垂直位置
+    const imgY = this.height - 600; // 共同的垂直位置
+
+    // 計算左邊按鈕的位置 (重新開始)
     this.cТ = t.cЕ(
       this.cΑ,
-      (this.width - this.cΑ.width) >> 1,
-      this.height - this.cΑ.height - 140
+      this.width / 2 - this.cΑ.width - spacing / 2, // 水平位置靠左
+      btnY
     );
 
-    // 添加新按钮的位置计算
+    // 計算右邊按鈕的位置 (前往連結)
     this.linkButtonRect = t.cЕ(
       this.linkButton,
-      (this.width - this.linkButton.width) >> 1,
-      this.height - this.linkButton.height - 30
+      this.width / 2 + spacing / 2, // 水平位置靠右
+      btnY
+    );
+    // 分享按鈕
+    this.shareButtonRect = t.cЕ(
+      this.shareButton,
+      this.width / 2 + spacing / 2, // 水平位置靠右
+      this.height
+    );
+
+    // 裝飾圖案
+    this.decorationRect = t.cЕ(
+      this.decoration,
+      this.width, // 水平位置靠右
+      imgY
     );
   },
   cF: function () {
@@ -3657,6 +3732,17 @@ var M = Best.hg.extend({
         this.linkButton,
         this.linkButtonRect[0],
         this.linkButtonRect[1]
+      );
+      Κ.drawImage(
+        this.shareButton,
+        this.shareButtonRect[0],
+        this.shareButtonRect[1]
+      );
+      // 繪製其餘裝飾
+      Κ.drawImage(
+        this.decoration,
+        this.decorationRect[0],
+        this.decorationRect[1]
       );
     }
     Κ.drawImage(

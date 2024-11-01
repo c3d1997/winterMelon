@@ -36,12 +36,28 @@ const handleResize = () => {
 
   const containerWidth = window.innerWidth;
   const containerHeight = window.innerHeight;
-  const scale = Math.min(containerWidth / 320, containerHeight / 416);
 
-  gameFrame.value.style.width = `${320 * scale}px`;
-  gameFrame.value.style.height = `${416 * scale}px`;
+  // 調整為更接近手機螢幕的比例 (例如 9:16)
+  const targetRatio = 9 / 16; // 或其他適合的比例
+
+  // 或者使用特定的數值比例
+  // const targetRatio = 375/667; // iPhone SE/8 比例
+
+  let width, height;
+
+  // 計算實際要使用的寬高
+  if (containerWidth / containerHeight > targetRatio) {
+    height = containerHeight;
+    width = height * targetRatio;
+  } else {
+    width = containerWidth;
+    height = width / targetRatio;
+  }
+
+  // 設置 iframe 尺寸
+  gameFrame.value.style.width = `${width}px`;
+  gameFrame.value.style.height = `${height}px`;
 };
-
 onMounted(() => {
   handleResize();
   window.addEventListener("resize", handleResize);

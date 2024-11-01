@@ -37,7 +37,7 @@
       <span>Enter verification code</span>
       <div class="inputStyle">
         <input
-          type="number"
+          type="text"
           placeholder="Verification Code"
           v-model="codeNumber"
           @input="onCodeInput"
@@ -93,22 +93,29 @@ const onCountryChanged = (countryObject) => {
 
 // 驗證碼驗證
 const codeNumber = ref("");
-const onCodeInput = () => {
-  // 先驗證必填
+const onCodeInput = (e) => {
+  const target = e.target;
+  // 只允許數字
+  codeNumber.value = target.value.replace(/[^\d]/g, "");
+  // 驗證流程
   if (!codeNumber.value) {
-    console.log("沒填寫");
+    console.log("必填欄位");
     error.value.code = false;
-  } else if (isNaN(codeNumber.value)) {
+    return;
+  }
+  if (isNaN(Number(codeNumber.value))) {
     console.log("格式不對");
     error.value.code = false;
-  } else if (String(codeNumber.value).length !== 6) {
-    console.log("長度不對");
-    error.value.code = false;
-  } else {
-    // 通過驗證
-    console.log("通過");
-    error.value.code = true;
+    return;
   }
+  if (codeNumber.value.length !== 6) {
+    console.log("長度須為6碼");
+    error.value.code = false;
+    return;
+  }
+  // 通過驗證
+  console.log("驗證通過");
+  error.value.code = true;
 };
 
 // 收取驗證碼
