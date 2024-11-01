@@ -1,6 +1,6 @@
 <template>
   <div class="gameBG"></div>
-  <div class="popupBG" v-if="is_pop || is_collect"></div>
+  <div class="popupBG" v-if="is_pop || is_collect || is_finish"></div>
   <div class="popup" v-if="is_pop">
     <div class="popup_card">
       <div class="popup_card-X" @click="closePop">
@@ -25,6 +25,20 @@
       <span>watering machine</span>
       <div class="collect_btn" @click="submitCollect">
         <img src="/images/ok.png" alt="" />
+      </div>
+    </div>
+  </div>
+  <div class="popup" v-if="is_finish">
+    <div class="popup_card">
+      <div class="popup_card-content finish">
+        <p>Congratulations !</p>
+        <span
+          >Congratulations on completing the game. Now, please go to the reward
+          claiming page. Thank you for playing.</span
+        >
+        <div class="finish_btn" @click="collectPop">
+          <img src="/images/winning.png" alt="" />
+        </div>
       </div>
     </div>
   </div>
@@ -79,7 +93,7 @@
           <div class="gameBottom_game-set">
             <img
               @click="router.push('game/melonRun')"
-              :class="{ filterSet: is_filter }"
+              :class="{ filterSet: is_filter || is_finish }"
               src="/images/game1.png"
               alt=""
             />
@@ -88,7 +102,7 @@
           <div class="gameBottom_game-set">
             <img
               @click="router.push('game/melonCamera')"
-              :class="{ filterSet: is_filter }"
+              :class="{ filterSet: is_filter || is_finish }"
               src="/images/game2.png"
               alt=""
             />
@@ -101,7 +115,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useUserStore } from "@/stores/userStore";
 import {
@@ -113,14 +127,13 @@ const userStore = useUserStore();
 const router = useRouter();
 const route = useRoute();
 const is_filter = ref(false);
-const is_pop = ref(true);
+const is_pop = ref(false);
 const is_collect = ref(false);
 // 防抖狀態
 const isSubmitting = ref(false);
 const closePop = () => {
   is_pop.value = false;
 };
-
 // 計算隨機位置
 const randomPosition = ref({
   top: "0px",
@@ -148,19 +161,34 @@ const generateRandomPosition = () => {
   };
 };
 
+const is_finish = ref(false);
 onMounted(async () => {
   generateRandomPosition();
   const memberInfo = await get_member_info();
   console.log(memberInfo);
   userStore.user = memberInfo.payload.data;
   console.log(userStore.user);
+  if (userStore.user.melon_info.melon_status == 0) {
+    is_pop.value = true;
+  }
+  if (userStore.user.melon_info.melon_status == 3) {
+    is_finish.value = true;
+  }
 });
 
 const collectPop = async () => {
-  is_collect.value = true;
+  if (!is_finish.value) {
+    console.log("尚未結束");
+    is_collect.value = true;
+  } else {
+    console.log("蒐集完畢");
+    router.push("/qa");
+  }
 };
 // 蒐集
 const submitCollect = async () => {
+  console.log("按下蒐集", isSubmitting.value);
+
   if (isSubmitting.value) return;
   try {
     isSubmitting.value = true;
@@ -175,7 +203,11 @@ const submitCollect = async () => {
       } else if (firstCollectionResult.status == "error") {
         console.log("第一次回報失敗");
       }
-    } else if (userStore.user.melon_info.melon_status == 1) {
+    } else if (
+      userStore.user.melon_info.melon_status == 1 ||
+      userStore.user.melon_info.melon_status == 2 ||
+      userStore.user.melon_info.melon_status == 3
+    ) {
       console.log("使用者收集物品");
       const normalCollectionResult = await get_collection();
       if (normalCollectionResult.status == "success") {
@@ -323,13 +355,13 @@ const submitCollect = async () => {
   left: calc(50% - 75px);
   width: 150px;
   position: relative;
-  z-index: 2;
+  z-index: 0;
   img {
     width: 100%;
   }
   &_collect {
     position: absolute;
-    z-index: -1;
+    z-index: -3;
     width: 80px;
     img {
       width: 100%;
@@ -505,6 +537,18 @@ const submitCollect = async () => {
   &_btn {
     width: 150px;
     margin-top: 30px;
+    img {
+      width: 100%;
+    }
+  }
+}
+.finish {
+  position: relative;
+  &_btn {
+    position: absolute;
+    bottom: -230px;
+    left: calc(50% - 75px);
+    width: 150px;
     img {
       width: 100%;
     }

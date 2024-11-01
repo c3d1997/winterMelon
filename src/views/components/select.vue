@@ -23,13 +23,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, onUnmounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useUserStore } from "@/stores/userStore";
 const userStore = useUserStore();
 const router = useRouter();
 const route = useRoute();
 
+const emit = defineEmits(["update:modelValue"]);
 const props = defineProps({
   modelValue: {
     type: [String, Number],
@@ -43,34 +44,43 @@ const props = defineProps({
     type: String,
     default: "請選擇",
   },
+  // 新增 id prop
+  id: {
+    type: String,
+    required: true,
+  },
 });
 
-const emit = defineEmits(["update:modelValue"]);
-
-const isOpen = ref(false);
 const selectRef = ref(null);
 
+// 改用 computed 來控制是否開啟
+const isOpen = computed(() => {
+  return userStore.openSelectId === props.id;
+});
 const selectedOption = computed(() => {
   return props.options.find((option) => option.value === props.modelValue);
 });
 
 const toggleDropdown = () => {
-  isOpen.value = !isOpen.value;
+  if (isOpen.value) {
+    userStore.closeAll();
+  } else {
+    userStore.setOpenSelect(props.id);
+  }
 };
 
 const selectOption = (option) => {
   emit("update:modelValue", option.value);
-  isOpen.value = false;
-  console.log(isOpen.value);
-  console.log(option.value);
+  userStore.closeAll();
 };
 
 // 點擊外部關閉下拉選單
 const clickOutside = (event) => {
   if (selectRef.value && !selectRef.value.contains(event.target)) {
-    isOpen.value = false;
+    userStore.closeAll();
   }
 };
+
 onMounted(() => {
   document.addEventListener("click", clickOutside);
 });
@@ -122,7 +132,7 @@ onMounted(() => {
   left: 0;
   right: 0;
   background: white;
-  border: 1px solid #ddd;
+  border: 2px solid $main-color;
   border-radius: 4px;
   margin-top: 4px;
   max-height: 200px;
@@ -133,6 +143,12 @@ onMounted(() => {
 .option {
   padding: 8px 12px;
   cursor: pointer;
+  color: $main-color;
+  padding: 16px;
+  padding-left: 20px;
+  &:last-child {
+    border-bottom: none;
+  }
 }
 
 .option:hover {

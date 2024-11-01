@@ -5,8 +5,16 @@ import { defineStore } from "pinia";
 export const useUserStore = defineStore("user", {
   state: () => ({
     user: "",
+    openSelectId: null,
   }),
-  actions: {},
+  actions: {
+    setOpenSelect(id) {
+      this.openSelectId = id;
+    },
+    closeAll() {
+      this.openSelectId = null;
+    },
+  },
   persist: {
     enabled: true,
     strategies: [

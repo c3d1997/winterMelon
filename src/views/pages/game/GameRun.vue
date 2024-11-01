@@ -14,22 +14,31 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useUserStore } from "@/stores/userStore";
+import { game_one_check } from "@/utils/api";
 const userStore = useUserStore();
 const router = useRouter();
 const route = useRoute();
 const gameFrame = ref(null);
-const gameScore = ref(0);
 // 處理遊戲消息
-const handleGameMessage = (event) => {
+const handleGameMessage = async (event) => {
   // 確保消息來源安全
   if (event.origin !== window.location.origin) return;
   const { type, data } = event.data;
   switch (type) {
-    case "gameOver":
-      gameScore.value = data.score;
+    case "gameOneOver":
       // 這裡可以處理遊戲結束後的邏輯
       console.log("遊戲結束，分數：", data.score);
-      console.log("最高分：", data.bestScore);
+      const dataS = {
+        score: data.score,
+      };
+      const gameOneResult = await game_one_check(dataS);
+      if (gameOneResult.status == "success") {
+        console.log("遊戲一完成");
+        router.push("/game");
+      } else if (gameOneResult.status == "error") {
+        console.log("遊戲一失敗");
+      }
+
       break;
     case "copyUrl":
       console.log("複製網址");

@@ -822,10 +822,9 @@ function Press(e) {
         if (scr >= 500) {
           // postMessage
           console.log("scr", scr);
-
           window.parent.postMessage(
             {
-              type: "gameOver",
+              type: "gameOneOver",
               data: {
                 score: scr,
                 bestScore: bstscr,
