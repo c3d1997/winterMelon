@@ -75,15 +75,26 @@ const route = useRoute();
 
 // 輪播數字控制
 const currentIndex = ref(1);
+const currentSlide = ref("1");
 const updateIndex = (slide) => {
-  console.log(slide);
-  currentIndex.value = slide.slidingToIndex + 1;
+  let index = slide.slidingToIndex;
+  if (index < 0) index = 1;
+  if (index > 1) index = 0;
+  currentIndex.value = index + 1;
+  currentSlide.value = aboutUs[index].key;
+  currentSlide.value = aboutUs[index].key;
 };
 
 const aboutUs = [
   {
+    key: "1",
     description:
       "Taiwanese Winter Melon Tea Bricks: The Leading Global Brand for Export Forever Sweety Lao Tao Ke,” originating from Dongshan, Tainan, is the latest local stalwart. Our manufacturing facilities are fully accredited with HACCP and ISO 22000 certifications, while our products carry validations such as Halal certification, D&B D-U-N-S® Number, USFDA, and more, facilitating unhindered progress for your export ventures.",
+  },
+  {
+    key: "2",
+    description:
+      "2Taiwanese Winter Melon Tea Bricks: The Leading Global Brand for Export Forever Sweety Lao Tao Ke,” originating from Dongshan, Tainan, is the latest local stalwart. Our manufacturing facilities are fully accredited with HACCP and ISO 22000 certifications, while our products carry validations such as Halal certification, D&B D-U-N-S® Number, USFDA, and more, facilitating unhindered progress for your export ventures.",
   },
 ];
 </script>

@@ -83,15 +83,16 @@ onMounted(async () => {
   console.log(userStore.user);
 });
 // 輪播數字控制
-const currentIndex = ref(0);
+const currentIndex = ref("1");
 // 人格預設E
 const currentSlide = ref("E");
 const updateIndex = (slide) => {
-  console.log("slide", slide);
-  currentIndex.value = slide.slidingToIndex;
-  // 控制選到哪個人格
-  currentSlide.value = mbtiTypes[slide.slidingToIndex].key;
-  console.log("currentSlide", currentSlide.value);
+  let index = slide.slidingToIndex;
+  if (index < 0) index = 7; // 如果是負數，設為最後一個
+  if (index > 7) index = 0; // 如果超過7，設為第一個
+
+  currentIndex.value = index + 1;
+  currentSlide.value = mbtiTypes[index].key;
 };
 // 人格內容
 const mbtiTypes = [
