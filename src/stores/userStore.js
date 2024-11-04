@@ -5,6 +5,7 @@ import { defineStore } from "pinia";
 export const useUserStore = defineStore("user", {
   state: () => ({
     user: "",
+    loveType: "",
     openSelectId: null,
   }),
   actions: {
@@ -17,6 +18,7 @@ export const useUserStore = defineStore("user", {
   },
   persist: {
     enabled: true,
+    loveType: true,
     strategies: [
       {
         key: "my_user_store",

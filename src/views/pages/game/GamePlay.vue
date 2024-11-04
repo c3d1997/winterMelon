@@ -188,7 +188,6 @@ const collectPop = async () => {
 // 蒐集
 const submitCollect = async () => {
   console.log("按下蒐集", isSubmitting.value);
-
   if (isSubmitting.value) return;
   try {
     isSubmitting.value = true;

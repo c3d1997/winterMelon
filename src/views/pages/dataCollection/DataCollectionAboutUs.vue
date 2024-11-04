@@ -10,13 +10,14 @@
     <div class="fenceCard_card">
       <div class="about">
         <div class="about_remind dataCardType1">
-          <p>About Us <img src="" alt="" /></p>
+          <p>About Us</p>
+          <img src="/images/logo.png" alt="" />
         </div>
         <!-- 直接拿mbti的改 -->
         <div class="mbtiCard_carousel">
           <div class="mbtiCard_carousel-card">
             <div class="carousel_index">
-              <p>{{ currentIndex }} / 8</p>
+              <p>{{ currentIndex }} / 2</p>
             </div>
             <Carousel
               :wrap-around="true"
@@ -24,7 +25,7 @@
               :touchDrag="true"
               @slide-start="updateIndex"
             >
-              <Slide v-for="(item, index) in mbtiTypes" :key="index">
+              <Slide v-for="(item, index) in aboutUs" :key="index">
                 <div class="carousel_content">
                   <div class="carousel_item"></div>
                   <span>{{ item.description }}</span>
@@ -73,59 +74,16 @@ const router = useRouter();
 const route = useRoute();
 
 // 輪播數字控制
-const currentIndex = ref(0);
+const currentIndex = ref(1);
 const updateIndex = (slide) => {
   console.log(slide);
-  currentIndex.value = slide.slidingToIndex;
+  currentIndex.value = slide.slidingToIndex + 1;
 };
 
-const mbtiTypes = [
+const aboutUs = [
   {
-    title: "Extroverted Winter Melon",
-    type: "(E type)",
     description:
-      "Loves sunlight and requires more external stimuli, such as heavy rain to promote growth.",
-  },
-  {
-    title: "Introverted Winter Melon",
-    type: "(I type)",
-    description: "Grows slowly and needs more care and a stable environment.",
-  },
-  {
-    title: "Sensing Winter Melon",
-    type: "(S type)",
-    description:
-      "Enjoys routine and particularly needs regular watering and fertilization.",
-  },
-  {
-    title: "Intuitive Winter Melon",
-    type: "(M type)",
-    description:
-      "May develop unexpected traits, such as unique shapes or colors.",
-  },
-  {
-    title: "Thinking Winter Melon",
-    type: "(T type)",
-    description:
-      "Responds sensitively to environmental changes, and over-caring may have negative effects.",
-  },
-  {
-    title: "Feeling Winter Melon",
-    type: "(F type)",
-    description:
-      "Requires more interaction and love from players for healthy growth.",
-  },
-  {
-    title: "Judging Winter Melon",
-    type: "(J type)",
-    description:
-      "Very orderly, grows quickly if players complete care tasks on time.",
-  },
-  {
-    title: "Perceiving Winter Melon",
-    type: "(P type)",
-    description:
-      "Thrives better in a changing environment, and random events serve as growth catalysts.",
+      "Taiwanese Winter Melon Tea Bricks: The Leading Global Brand for Export Forever Sweety Lao Tao Ke,” originating from Dongshan, Tainan, is the latest local stalwart. Our manufacturing facilities are fully accredited with HACCP and ISO 22000 certifications, while our products carry validations such as Halal certification, D&B D-U-N-S® Number, USFDA, and more, facilitating unhindered progress for your export ventures.",
   },
 ];
 </script>
@@ -371,8 +329,14 @@ const mbtiTypes = [
   margin: auto;
   padding-top: 20px;
   &_remind {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
     font-weight: 600;
     font-size: 18px;
+    img {
+      width: 50%;
+    }
   }
 }
 </style>

@@ -7,7 +7,11 @@
       </div>
       <div class="popup_card-content">
         <p>Get Reward Place Here:</p>
-        <span>放地址</span>
+        <span class="address">新山店</span>
+        <a href="https://maps.app.goo.gl/VW1m6SWCQpveMo798" class="address"
+          >59, Jln Anggerik Emas 1, Taman Perusahaan Ringan Pulai, 81300 Skudai,
+          Johor, 馬來西亞</a
+        >
       </div>
     </div>
   </div>
@@ -34,7 +38,7 @@
       </div>
       <div class="popup_card-content redeemConfirm">
         <p>提醒確認重新開始</p>
-        <div class="redeemConfirm_img" @click="router.push('/game')">
+        <div class="redeemConfirm_img" @click="reStart">
           <img src="/images/confirm.png" alt="" />
         </div>
       </div>
@@ -50,7 +54,8 @@
     <div class="fenceCard_top"></div>
     <div class="fenceCard_card">
       <div class="reward">
-        <h3>Congratulations! Your Reward:</h3>
+        <h3 v-if="!is_reGame">Congratulations! Your Reward:</h3>
+        <h3 v-else>Your Reward!</h3>
         <div class="reward_card">
           <img
             :class="{ reward_filter: is_reGame }"
@@ -74,24 +79,23 @@
             <p>Write-off Code</p>
             <div class="inputStyle">
               <input
-                type="number"
-                placeholder="Verification Code"
-                v-model="codeNumber"
-                @input="onCodeInput"
+                type="text"
+                :value="codeNumber"
+                readonly
                 class="inputStyle_Input"
               />
               <div class="inputStyle_icon">
                 <img src="/images/vCode.png" alt="" />
               </div>
             </div>
-            <div class="errorMessage">
-              <p v-if="!error.code">Enter a valid verification code</p>
-            </div>
             <selectModel
               v-model="selectedValue1"
               :options="options1"
               placeholder="Select Operating Store"
             ></selectModel>
+            <div class="errorMessage" v-if="formErrors.location">
+              請選擇所處區域
+            </div>
           </div>
           <div v-if="is_reGame" class="reGame">
             <div class="submitBtnRE">
@@ -114,50 +118,79 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useUserStore } from "@/stores/userStore";
 import selectModel from "@/views/components/select.vue";
+import { write_off, get_member_info, restart_game } from "@/utils/api";
 const userStore = useUserStore();
 const router = useRouter();
 const route = useRoute();
 const is_reGame = ref(false);
 const is_re = ref(false);
-const handleRedeem = () => {
-  is_reGame.value = true;
-  is_confirm.value = false;
+
+const isSubmit = ref(false);
+const handleRedeem = async () => {
+  if (isSubmit.value == true) {
+    return;
+  }
+  isSubmit.value = true;
+  try {
+    const data = {
+      branch: selectedValue1.value,
+    };
+    console.log(data);
+    const writeOffResult = await write_off(data);
+    if (writeOffResult.status == "success") {
+      console.log("核銷獎品成功");
+      is_reGame.value = true;
+      is_confirm.value = false;
+      const member = await get_member_info();
+      userStore.user = member;
+    } else if (writeOffResult.status == "error") {
+      console.log("核銷獎品失敗");
+    }
+  } catch (error) {
+    console.log("核銷獎品錯誤", error);
+  } finally {
+    isSubmit.value = false;
+  }
+};
+// 重新開始
+const reStart = async () => {
+  if (isSubmit.value == true) {
+    return;
+  }
+  isSubmit.value = true;
+  try {
+    const restartGameResult = await restart_game();
+    if (restartGameResult.status == "success") {
+      console.log("重新開始成功");
+      router.push("/registration/mbti");
+    } else if (restartGameResult.status == "error") {
+      console.log("重新開始失敗");
+    }
+  } catch (error) {
+    console.log("重新開始錯誤", error);
+  } finally {
+    isSubmit.value = false;
+  }
 };
 const rePop = () => {
   is_re.value = true;
 };
-// 驗證碼驗證
-const error = ref({
-  code: true,
-});
 const codeNumber = ref("");
-const onCodeInput = () => {
-  // 先驗證必填
-  if (!codeNumber.value) {
-    console.log("沒填寫");
-    error.value.code = false;
-  } else if (isNaN(codeNumber.value)) {
-    console.log("格式不對");
-    error.value.code = false;
-  } else if (String(codeNumber.value).length !== 6) {
-    console.log("長度不對");
-    error.value.code = false;
-  } else {
-    // 通過驗證
-    console.log("通過");
-    error.value.code = true;
+const generateRandomCode = () => {
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let result = "";
+
+  for (let i = 0; i < 8; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
   }
+  codeNumber.value = result;
 };
 const selectedValue1 = ref("");
-const options1 = [
-  { value: "1", label: "選項一" },
-  { value: "2", label: "選項二" },
-  { value: "3", label: "選項三" },
-];
+const options1 = [{ value: "新山店", label: "新山店" }];
 
 // 哪裡有店面
 const is_reward = ref(false);
@@ -166,6 +199,9 @@ const rewardPop = () => {
   is_reward.value = true;
 };
 const confirmPop = () => {
+  if (!validateForm()) {
+    return;
+  }
   is_confirm.value = true;
 };
 const closePop = () => {
@@ -173,6 +209,24 @@ const closePop = () => {
   is_confirm.value = false;
   is_re.value = false;
 };
+
+// 下拉選單驗證
+const formErrors = ref({
+  location: false,
+});
+const validateForm = () => {
+  formErrors.value.location = !selectedValue1.value;
+  return !Object.values(formErrors.value).some((error) => error);
+};
+watch(selectedValue1, (newValue) => {
+  if (newValue) {
+    formErrors.value.location = false;
+  }
+});
+
+onMounted(() => {
+  generateRandomCode();
+});
 </script>
 
 <style lang="scss" scoped>
@@ -314,5 +368,17 @@ const closePop = () => {
       width: 100%;
     }
   }
+}
+.popup_card-content {
+  span {
+    margin-top: 12px;
+  }
+  a {
+    font-size: 14px;
+    color: $main-color;
+  }
+}
+.inputStyle {
+  margin-bottom: 20px;
 }
 </style>

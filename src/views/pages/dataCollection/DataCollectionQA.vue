@@ -18,8 +18,8 @@
         <div class="qa_selects">
           <div class="qa_selects-group">
             <selectModel
-              v-model="selectedValue1"
-              :options="options1"
+              v-model="sex"
+              :options="sexOption"
               placeholder="What is your gender?"
               id="select1"
             ></selectModel>
@@ -27,8 +27,8 @@
           </div>
           <div class="qa_selects-group">
             <selectModel
-              v-model="selectedValue2"
-              :options="options2"
+              v-model="age"
+              :options="ageOption"
               placeholder="What is your age?"
               id="select2"
             ></selectModel>
@@ -36,8 +36,8 @@
           </div>
           <div class="qa_selects-group">
             <selectModel
-              v-model="selectedValue3"
-              :options="options3"
+              v-model="buyFrequency"
+              :options="buyFrequencyOption"
               placeholder="How often you buy?"
               id="select3"
             ></selectModel>
@@ -119,34 +119,35 @@ import { ref, onMounted, computed, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useUserStore } from "@/stores/userStore";
 import selectModel from "@/views/components/select.vue";
+import { set_all_info } from "@/utils/api";
 const userStore = useUserStore();
 const router = useRouter();
 const route = useRoute();
 
 // 下拉
-const selectedValue1 = ref("");
-const options1 = [
-  { value: "1", label: "Male" },
-  { value: "2", label: "Female" },
+const sex = ref("");
+const sexOption = [
+  { value: "Male", label: "Male" },
+  { value: "Female", label: "Female" },
 ];
-const selectedValue2 = ref("");
-const options2 = [
-  { value: "1", label: "under 15" },
-  { value: "2", label: "16-20" },
-  { value: "3", label: "21-25" },
-  { value: "4", label: "26-30" },
-  { value: "5", label: "31-35" },
-  { value: "6", label: "36-40" },
-  { value: "7", label: "41-45" },
-  { value: "8", label: "46-50" },
-  { value: "9", label: "50 above" },
+const age = ref("");
+const ageOption = [
+  { value: "under 15", label: "under 15" },
+  { value: "16-20", label: "16-20" },
+  { value: "21-25", label: "21-25" },
+  { value: "26-30", label: "26-30" },
+  { value: "31-35", label: "31-35" },
+  { value: "36-40", label: "36-40" },
+  { value: "41-45", label: "41-45" },
+  { value: "46-50", label: "46-50" },
+  { value: "50 above", label: "50 above" },
 ];
-const selectedValue3 = ref("");
-const options3 = [
-  { value: "1", label: "First time" },
-  { value: "2", label: "1-3 times a month" },
-  { value: "3", label: "3-10 times a month" },
-  { value: "4", label: "More than 10 times a month" },
+const buyFrequency = ref("");
+const buyFrequencyOption = [
+  { value: "First time", label: "First time" },
+  { value: "1-3 times a month", label: "1-3 times a month" },
+  { value: "3-10 times a month", label: "3-10 times a month" },
+  { value: "More than 10 times a month", label: "More than 10 times a month" },
 ];
 const region = ref("");
 const regionOption = [
@@ -326,20 +327,20 @@ watch(state, (newValue) => {
 });
 
 // 單選
-const selected = ref("1");
+const selected = ref("Coffee");
 
 const radioList = [
-  { value: "1", label: "Coffee" },
-  { value: "2", label: "grass jelly" },
-  { value: "3", label: "Cendol" },
-  { value: "4", label: "lemon" },
-  { value: "5", label: "pineapple " },
-  { value: "6", label: "Dragon Fruit" },
-  { value: "7", label: "guava" },
-  { value: "8", label: "milk" },
-  { value: "9", label: "roselle" },
-  { value: "10", label: "herbal" },
-  { value: "11", label: "soymilk" },
+  { value: "Coffee", label: "Coffee" },
+  { value: "grass jelly", label: "grass jelly" },
+  { value: "Cendol", label: "Cendol" },
+  { value: "lemon", label: "lemon" },
+  { value: "pineapple", label: "pineapple" },
+  { value: "Dragon Fruit", label: "Dragon Fruit" },
+  { value: "guava", label: "guava" },
+  { value: "milk", label: "milk" },
+  { value: "roselle", label: "roselle" },
+  { value: "herbal", label: "herbal" },
+  { value: "soymilk", label: "soymilk" },
 ];
 // 新增錯誤狀態
 const formErrors = ref({
@@ -353,33 +354,46 @@ const formErrors = ref({
 
 // 驗證函數
 const validateForm = () => {
-  let isValid = true;
-  // 重置錯誤狀態
+  // 基本必填驗證
   formErrors.value = {
-    gender: selectedValue1.value ? false : true,
-    age: selectedValue2.value ? false : true,
-    frequency: selectedValue3.value ? false : true,
-    location: state.value ? false : true,
-    locationDetial: state.value && district.value ? false : true,
+    gender: sex.value ? false : true,
+    age: age.value ? false : true,
+    frequency: buyFrequency.value ? false : true,
+    from: region.value ? false : true,
+    location: false,
+    locationDetial: false,
   };
+
+  if (region.value) {
+    formErrors.value.location = state.value ? false : true;
+
+    if (
+      state.value &&
+      region.value === "West Malaysia" &&
+      state.value !== "westFederalTerritory" &&
+      state.value !== "Perlis"
+    ) {
+      formErrors.value.locationDetial = district.value ? false : true;
+    }
+  }
 
   return !Object.values(formErrors.value).some((error) => error);
 };
 
 // 監聽每個 select 值的變化
-watch(selectedValue1, (newValue) => {
+watch(sex, (newValue) => {
   if (newValue) {
     formErrors.value.gender = false;
   }
 });
 
-watch(selectedValue2, (newValue) => {
+watch(age, (newValue) => {
   if (newValue) {
     formErrors.value.age = false;
   }
 });
 
-watch(selectedValue3, (newValue) => {
+watch(buyFrequency, (newValue) => {
   if (newValue) {
     formErrors.value.frequency = false;
   }
@@ -406,19 +420,42 @@ watch(region, (newValue) => {
 });
 
 // 送出資料
+const isSubmitting = ref(false);
 const submitIntroduce = async () => {
-  if (!validateForm()) {
-    console.log("請選取所有項目");
-    return;
+  // 防抖動：增加一個狀態來控制按鈕
+  if (isSubmitting.value) return;
+  isSubmitting.value = true;
+  try {
+    if (!validateForm()) {
+      console.log("請選取所有項目");
+      return;
+    }
+
+    const data = {
+      love_type: selected.value,
+      birthday: age.value,
+      address: [region.value, state.value, district.value]
+        .filter(Boolean)
+        .join("/"),
+      buy_frequency: buyFrequency.value,
+      sex: sex.value,
+    };
+    console.log(data);
+
+    const setAllInfoResult = await set_all_info(data);
+    if (setAllInfoResult.status == "success") {
+      console.log("設定使用者資訊成功");
+      userStore.loveType = selected.value;
+      router.push("/introduce");
+    } else if (setAllInfoResult.status == "error") {
+      console.log("設定使用者資訊失敗");
+    }
+  } catch (error) {
+    console.error("提交表單時發生錯誤:", error);
+  } finally {
+    // 不管成功或失敗，最後都要解除按鈕鎖定
+    isSubmitting.value = false;
   }
-  // 給地址的時候 區域跟啥都用/
-  console.log(selectedValue1.value);
-  console.log(selectedValue2.value);
-  console.log(selectedValue3.value);
-  console.log(region.value);
-  console.log(state.value);
-  console.log(district.value);
-  console.log(selected.value);
 };
 </script>
 
