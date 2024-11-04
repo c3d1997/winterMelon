@@ -81,11 +81,11 @@
       <div class="gameBottom_item">item</div>
       <div class="gameBottom_btn" @click="collectPop">
         <img
-          :class="{ filterSet: is_filter }"
+          :class="{ filterSet: !is_collection }"
           src="/images/collect.png"
           alt=""
         />
-        <p v-if="is_filter">00:00:00</p>
+        <p v-if="!is_collection">{{ timerStore.formatTime() }}</p>
       </div>
 
       <div class="gameBottom_gameStyle">
@@ -93,20 +93,20 @@
           <div class="gameBottom_game-set">
             <img
               @click="router.push('game/melonRun')"
-              :class="{ filterSet: is_filter || is_finish }"
+              :class="{ filterSet: !is_game_one || is_finish }"
               src="/images/game1.png"
               alt=""
             />
-            <p v-if="is_filter">00:00:00</p>
+            <p v-if="!is_game_one">{{ timerStore.formatTime() }}</p>
           </div>
           <div class="gameBottom_game-set">
             <img
               @click="router.push('game/melonCamera')"
-              :class="{ filterSet: is_filter || is_finish }"
+              :class="{ filterSet: !is_game_two || is_finish }"
               src="/images/game2.png"
               alt=""
             />
-            <p v-if="is_filter">00:00:00</p>
+            <p v-if="!is_game_two">{{ timerStore.formatTime() }}</p>
           </div>
         </div>
       </div>
@@ -118,15 +118,21 @@
 import { ref, onMounted, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useUserStore } from "@/stores/userStore";
+import { useTimerStore } from "@/stores/timeStore";
 import {
   get_member_info,
   get_collection,
   completed_first_task,
+  get_gift,
 } from "@/utils/api";
+
+const timerStore = useTimerStore();
 const userStore = useUserStore();
 const router = useRouter();
 const route = useRoute();
-const is_filter = ref(false);
+const is_collection = ref(true);
+const is_game_one = ref(true);
+const is_game_two = ref(true);
 const is_pop = ref(false);
 const is_collect = ref(false);
 // 防抖狀態
@@ -163,26 +169,72 @@ const generateRandomPosition = () => {
 
 const is_finish = ref(false);
 onMounted(async () => {
+  timerStore.startTimer();
   generateRandomPosition();
-  const memberInfo = await get_member_info();
-  console.log(memberInfo);
-  userStore.user = memberInfo.payload.data;
-  console.log(userStore.user);
+  await userStore.getMemberInfo();
   if (userStore.user.melon_info.melon_status == 0) {
     is_pop.value = true;
+  } else {
+    console.log("不是第一次");
+    is_collection.value = userStore.user.setting_info.is_collection;
+    is_game_one.value = userStore.user.setting_info.is_game_one;
+    is_game_two.value = userStore.user.setting_info.is_game_two;
   }
   if (userStore.user.melon_info.melon_status == 3) {
     is_finish.value = true;
   }
 });
 
+watch(
+  () => userStore.user.setting_info,
+  (newSettings) => {
+    if (newSettings) {
+      console.log(newSettings, "setting_info改變");
+      is_collection.value = newSettings.is_collection;
+      is_game_one.value = newSettings.is_game_one;
+      is_game_two.value = newSettings.is_game_two;
+    }
+  },
+  { deep: true }
+);
+
+// 監聽冬瓜狀態變化
+watch(
+  () => userStore.user.melon_info.melon_status,
+  (newStatus) => {
+    if (newStatus === 0) {
+      is_pop.value = true;
+    } else if (newStatus === 3) {
+      is_finish.value = true;
+    }
+  }
+);
+
 const collectPop = async () => {
-  if (!is_finish.value) {
-    console.log("尚未結束");
-    is_collect.value = true;
-  } else {
-    console.log("蒐集完畢");
-    router.push("/qa");
+  if (isSubmitting.value) return;
+  try {
+    isSubmitting.value = true;
+    if (!is_finish.value) {
+      console.log("尚未結束");
+      is_collect.value = true;
+    } else {
+      console.log("蒐集完畢");
+      if (userStore.user.play_times != 1) {
+        const getGiftsResult = await get_gift();
+        if (getGiftsResult.status == "success") {
+          console.log("重複取得禮物成功");
+          router.push("/reward");
+        } else if (getGiftsResult.status == "error") {
+          console.log("重複取得禮物失敗");
+        }
+      } else {
+        router.push("/qa");
+      }
+    }
+  } catch (error) {
+    console.log("winnin失敗", error);
+  } finally {
+    isSubmitting.value = false;
   }
 };
 // 蒐集
@@ -196,8 +248,7 @@ const submitCollect = async () => {
       const firstCollectionResult = await completed_first_task();
       if (firstCollectionResult.status == "success") {
         console.log("第一次回報成功");
-        const memberInfo = await get_member_info();
-        userStore.user = memberInfo.payload.data;
+        await userStore.getMemberInfo();
         is_collect.value = false;
       } else if (firstCollectionResult.status == "error") {
         console.log("第一次回報失敗");
@@ -217,6 +268,8 @@ const submitCollect = async () => {
         console.log("收集物品失敗");
       }
     }
+  } catch (error) {
+    console.log("蒐集失敗", error);
   } finally {
     isSubmitting.value = false;
   }

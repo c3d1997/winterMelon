@@ -122,7 +122,12 @@ import { ref, onMounted, computed, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useUserStore } from "@/stores/userStore";
 import selectModel from "@/views/components/select.vue";
-import { write_off, get_member_info, restart_game } from "@/utils/api";
+import {
+  write_off,
+  get_member_info,
+  restart_game,
+  get_gift,
+} from "@/utils/api";
 const userStore = useUserStore();
 const router = useRouter();
 const route = useRoute();
@@ -145,8 +150,7 @@ const handleRedeem = async () => {
       console.log("核銷獎品成功");
       is_reGame.value = true;
       is_confirm.value = false;
-      const member = await get_member_info();
-      userStore.user = member;
+      await userStore.getMemberInfo();
     } else if (writeOffResult.status == "error") {
       console.log("核銷獎品失敗");
     }
@@ -156,6 +160,16 @@ const handleRedeem = async () => {
     isSubmit.value = false;
   }
 };
+watch(
+  () => userStore.user.setting_info.is_wirte_off,
+  (newStatus) => {
+    if (newStatus === true) {
+      is_reGame.value = true;
+    } else {
+      is_reGame.value = false;
+    }
+  }
+);
 // 重新開始
 const reStart = async () => {
   if (isSubmit.value == true) {
@@ -224,8 +238,10 @@ watch(selectedValue1, (newValue) => {
   }
 });
 
-onMounted(() => {
+onMounted(async () => {
   generateRandomCode();
+  await userStore.getMemberInfo();
+  is_reGame.value = userStore.user.setting_info.is_wirte_off;
 });
 </script>
 

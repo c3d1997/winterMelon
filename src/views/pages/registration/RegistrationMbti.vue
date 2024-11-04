@@ -77,10 +77,7 @@ const userStore = useUserStore();
 const router = useRouter();
 const route = useRoute();
 onMounted(async () => {
-  const memberInfo = await get_member_info();
-  console.log(memberInfo);
-  userStore.user = memberInfo.payload.data;
-  console.log(userStore.user);
+  await userStore.getMemberInfo();
 });
 // 輪播數字控制
 const currentIndex = ref("1");
