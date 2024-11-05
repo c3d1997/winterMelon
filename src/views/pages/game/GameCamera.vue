@@ -12,11 +12,16 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
-
+import { useRouter, useRoute } from "vue-router";
+import { useUserStore } from "@/stores/userStore";
+import { game_two_check } from "@/utils/api";
+const userStore = useUserStore();
+const router = useRouter();
+const route = useRoute();
 const gameFrame = ref(null);
 const gameScore = ref(0);
 // 處理遊戲消息
-const handleGameMessage = (event) => {
+const handleGameMessage = async (event) => {
   // 確保消息來源安全
   if (event.origin !== window.location.origin) return;
 
@@ -24,9 +29,23 @@ const handleGameMessage = (event) => {
 
   switch (type) {
     case "gameOver":
-      gameScore.value = data.score;
+      gameScore.value = Math.floor(data.score);
       // 這裡可以處理遊戲結束後的邏輯
       console.log("遊戲結束，分數：", data.score);
+      const dataS = {
+        score: gameScore.value,
+      };
+      const gameOneResult = await game_two_check(dataS);
+      if (gameOneResult.status == "success") {
+        console.log("遊戲二完成");
+        router.push("/game");
+      } else if (gameOneResult.status == "error") {
+        console.log("遊戲二失敗");
+      }
+
+      break;
+    case "copyUrl":
+      console.log("複製網址");
       break;
   }
 };

@@ -1,6 +1,78 @@
 <template>
   <div class="gameBG"></div>
-  <div class="popupBG" v-if="is_pop || is_collect || is_finish"></div>
+  <div
+    class="popupBG"
+    v-if="
+      is_pop ||
+      is_collect ||
+      is_finish ||
+      (melonStatus == 0 && userStore.user?.play_times == 1)
+    "
+  ></div>
+  <!-- 遊戲教學 -->
+  <div
+    class="popup gamePop"
+    v-if="
+      !is_pop &&
+      melonStatus == 0 &&
+      !is_clickCollect &&
+      userStore.user?.play_times == 1
+    "
+  >
+    <div class="gameTeach gameTeach1">
+      <p>
+        Click here for your <br />
+        first collection
+      </p>
+    </div>
+    <div class="gameBottom_btn" @click="collectPop">
+      <img
+        :class="{ filterSet: !is_collection && melonStatus != 0 }"
+        src="/images/collect.png"
+        alt=""
+      />
+      <p v-if="!is_collection && melonStatus != 0">
+        {{ timerStore.formatTime() }}
+      </p>
+    </div>
+    <div class="gameTeach gameTeach2">
+      <p>
+        Collect to <br />
+        unlock the game
+      </p>
+    </div>
+    <div class="gameBottom_gameStyle">
+      <div class="gameBottom_game">
+        <div class="gameBottom_game-set">
+          <img
+            @click="router.push('game/melonRun')"
+            :class="{
+              filterSet: (!is_game_one || is_finish) && melonStatus == 0,
+            }"
+            src="/images/game1.png"
+            alt=""
+          />
+          <p v-if="!is_game_one && melonStatus != 0">
+            {{ timerStore.formatTime() }}
+          </p>
+        </div>
+        <div class="gameBottom_game-set">
+          <img
+            @click="router.push('game/melonCamera')"
+            :class="{
+              filterSet: (!is_game_two || is_finish) && melonStatus == 0,
+            }"
+            src="/images/game2.png"
+            alt=""
+          />
+          <p v-if="!is_game_two && melonStatus != 0">
+            {{ timerStore.formatTime() }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 第一次進入 -->
   <div class="popup" v-if="is_pop">
     <div class="popup_card">
       <div class="popup_card-X" @click="closePop">
@@ -16,6 +88,7 @@
       </div>
     </div>
   </div>
+  <!-- 獲得蒐集物 -->
   <div class="popup" v-if="is_collect">
     <div class="collect">
       <p>You Got the Item</p>
@@ -28,6 +101,14 @@
       </div>
     </div>
   </div>
+  <div class="popup" v-if="is_collect_animation">
+    <div class="collect">
+      <div class="collect_object collect_object-ani">
+        <img ref="collectItem" src="/images/collectEX.png" alt="" />
+      </div>
+    </div>
+  </div>
+  <!-- 完成蒐集 -->
   <div class="popup" v-if="is_finish">
     <div class="popup_card">
       <div class="popup_card-content finish">
@@ -53,7 +134,7 @@
       <div class="gameTop_mission">
         <div class="gameTop_mission-left">
           <p>MISSION</p>
-          <span>0 / 4</span>
+          <span>{{ userStore.user.melon_info.melon_status }} / 4</span>
         </div>
         <div class="gameTop_mission-right">
           <img @click="is_pop = true" src="/images/qa.png" alt="" />
@@ -61,31 +142,37 @@
       </div>
     </div>
     <div class="gameMid">
-      <img src="/images/profile.png" alt="" />
+      <img :src="`/images/melonStatus/${melonStatus}.png`" alt="" />
       <div class="gameMid_collect" :style="randomPosition">
         <img src="/images/collectEX.png" alt="" />
       </div>
     </div>
     <div class="gameBottom">
+      <div class="gameBottom_BG"></div>
       <div class="gameBottom_box">
         <div class="gameBottom_box-package">
+          <img src="/images/water.png" alt="" />
           <div class="gameBottom_box-index">1</div>
         </div>
         <div class="gameBottom_box-package">
+          <img src="/images/air.png" alt="" />
           <div class="gameBottom_box-index">1</div>
         </div>
         <div class="gameBottom_box-package">
+          <img src="/images/sun.png" alt="" />
           <div class="gameBottom_box-index">1</div>
         </div>
       </div>
       <div class="gameBottom_item">item</div>
       <div class="gameBottom_btn" @click="collectPop">
         <img
-          :class="{ filterSet: !is_collection }"
+          :class="{ filterSet: !is_collection && melonStatus != 0 }"
           src="/images/collect.png"
           alt=""
         />
-        <p v-if="!is_collection">{{ timerStore.formatTime() }}</p>
+        <p v-if="!is_collection && melonStatus != 0">
+          {{ timerStore.formatTime() }}
+        </p>
       </div>
 
       <div class="gameBottom_gameStyle">
@@ -93,20 +180,28 @@
           <div class="gameBottom_game-set">
             <img
               @click="router.push('game/melonRun')"
-              :class="{ filterSet: !is_game_one || is_finish }"
+              :class="{
+                filterSet: !is_game_one || is_finish || melonStatus == 0,
+              }"
               src="/images/game1.png"
               alt=""
             />
-            <p v-if="!is_game_one">{{ timerStore.formatTime() }}</p>
+            <p v-if="!is_game_one || melonStatus == 0">
+              {{ timerStore.formatTime() }}
+            </p>
           </div>
           <div class="gameBottom_game-set">
             <img
               @click="router.push('game/melonCamera')"
-              :class="{ filterSet: !is_game_two || is_finish }"
+              :class="{
+                filterSet: !is_game_two || is_finish || melonStatus == 0,
+              }"
               src="/images/game2.png"
               alt=""
             />
-            <p v-if="!is_game_two">{{ timerStore.formatTime() }}</p>
+            <p v-if="!is_game_two || melonStatus == 0">
+              {{ timerStore.formatTime() }}
+            </p>
           </div>
         </div>
       </div>
@@ -125,6 +220,7 @@ import {
   completed_first_task,
   get_gift,
 } from "@/utils/api";
+import gsap from "gsap";
 
 const timerStore = useTimerStore();
 const userStore = useUserStore();
@@ -168,10 +264,13 @@ const generateRandomPosition = () => {
 };
 
 const is_finish = ref(false);
+const melonStatus = ref();
 onMounted(async () => {
   timerStore.startTimer();
   generateRandomPosition();
   await userStore.getMemberInfo();
+  melonStatus.value = userStore.user.melon_info.melon_status;
+
   if (userStore.user.melon_info.melon_status == 0) {
     is_pop.value = true;
   } else {
@@ -202,6 +301,8 @@ watch(
 watch(
   () => userStore.user.melon_info.melon_status,
   (newStatus) => {
+    melonStatus.value = newStatus;
+    console.log(melonStatus.value, "melonStatus");
     if (newStatus === 0) {
       is_pop.value = true;
     } else if (newStatus === 3) {
@@ -209,14 +310,16 @@ watch(
     }
   }
 );
-
+const is_clickCollect = ref();
 const collectPop = async () => {
   if (isSubmitting.value) return;
   try {
+    is_clickCollect.value = true;
     isSubmitting.value = true;
     if (!is_finish.value) {
       console.log("尚未結束");
       is_collect.value = true;
+      is_collect_animation.value = true;
     } else {
       console.log("蒐集完畢");
       if (userStore.user.play_times != 1) {
@@ -238,6 +341,9 @@ const collectPop = async () => {
   }
 };
 // 蒐集
+
+const collectItem = ref(null);
+const is_collect_animation = ref(false);
 const submitCollect = async () => {
   console.log("按下蒐集", isSubmitting.value);
   if (isSubmitting.value) return;
@@ -250,6 +356,7 @@ const submitCollect = async () => {
         console.log("第一次回報成功");
         await userStore.getMemberInfo();
         is_collect.value = false;
+        animationCollect(1);
       } else if (firstCollectionResult.status == "error") {
         console.log("第一次回報失敗");
       }
@@ -264,6 +371,7 @@ const submitCollect = async () => {
         const memberInfo = await get_member_info();
         userStore.user = memberInfo.payload.data;
         is_collect.value = false;
+        animationCollect(1);
       } else if (normalCollectionResult.status == "error") {
         console.log("收集物品失敗");
       }
@@ -273,6 +381,59 @@ const submitCollect = async () => {
   } finally {
     isSubmitting.value = false;
   }
+};
+
+const animationCollect = async (e) => {
+  if (!is_collect_animation.value) {
+    return;
+  }
+  // 獲取目標位置和來源位置
+  const targetBox = document.querySelector(
+    `.gameBottom_box-package:nth-child(${e}) .gameBottom_box-index`
+  );
+  const targetBounds = targetBox.getBoundingClientRect();
+  const itemBounds = collectItem.value.getBoundingClientRect();
+
+  // 計算中心點位置差異
+  const centerX =
+    targetBounds.left +
+    targetBounds.width / 2 -
+    (itemBounds.left + itemBounds.width / 2 + 50);
+  const centerY =
+    targetBounds.top +
+    targetBounds.height / 2 -
+    (itemBounds.top + itemBounds.height / 2 - 50);
+
+  // 創建動畫時間軸
+  const tl = gsap.timeline({
+    onComplete: () => {
+      is_collect_animation.value = false;
+    },
+  });
+
+  // 先向上彈起
+  tl.to(collectItem.value, {
+    duration: 0.5,
+    y: -150, // 向上彈起的高度
+    ease: "power2.out",
+  })
+    // 然後掉落到目標位置
+    .to(collectItem.value, {
+      duration: 1,
+      scale: 0.5,
+      x: centerX,
+      y: centerY,
+      ease: "power2.in", // 使用彈跳效果
+    });
+
+  // 目標位置的視覺反饋
+  gsap.to(targetBox, {
+    duration: 0.3,
+    scale: 1.2,
+    delay: 1.5, // 調整延遲時間配合新的動畫
+    yoyo: true,
+    repeat: 1,
+  });
 };
 </script>
 
@@ -453,6 +614,12 @@ const submitCollect = async () => {
       border-image: url(/images/border_04.png) stretch;
       border-image-slice: 32 fill;
       z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      img {
+        height: 100%;
+      }
       &::after {
         content: "";
         position: absolute;
@@ -562,6 +729,7 @@ const submitCollect = async () => {
   }
 }
 .filterSet {
+  pointer-events: none;
   filter: brightness(0.8) contrast(0.7);
 }
 .collect {
@@ -584,6 +752,11 @@ const submitCollect = async () => {
     img {
       width: 100%;
     }
+    &-ani {
+      display: flex;
+      align-items: center;
+      transform: translateY(-50px);
+    }
   }
   &_btn {
     width: 150px;
@@ -603,6 +776,66 @@ const submitCollect = async () => {
     img {
       width: 100%;
     }
+  }
+}
+.gamePop {
+  height: 100%;
+  .gameBottom_game {
+    top: unset;
+    bottom: 159px;
+  }
+  .gameBottom_btn {
+    top: unset;
+    bottom: 151px;
+  }
+  .filterSet {
+    filter: brightness(0.6) contrast(0.7);
+  }
+}
+.gameTeach {
+  position: absolute;
+  &.gameTeach1 {
+    bottom: 241px;
+    left: 50%;
+    transform: translateX(-50%);
+    &::after {
+      content: "";
+      position: absolute;
+      width: 0px;
+      height: 0px;
+      border-left: 5px solid transparent;
+      border-top: 5px solid transparent;
+      border-right: 5px solid #ffffff;
+      border-bottom: 5px solid #ffffff;
+      bottom: -15px;
+      right: calc(50% - 5px);
+      transform: rotate(45deg);
+    }
+  }
+  &.gameTeach2 {
+    bottom: 361px;
+    right: 90px;
+    &::after {
+      content: "";
+      position: absolute;
+      width: 0px;
+      height: 0px;
+      border-left: 5px solid transparent;
+      border-top: 5px solid transparent;
+      border-right: 5px solid #ffffff; // 箭頭顏色
+      border-bottom: 5px solid #ffffff; // 箭頭顏色
+      transform: rotate(45deg); // 旋轉 45 度指向右下
+      bottom: -9px; // 調整箭頭位置
+      right: -15px; // 調整箭頭位置
+      transform: rotate(-0deg);
+    }
+  }
+  p {
+    text-align: center;
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 18px;
   }
 }
 </style>

@@ -2446,12 +2446,12 @@ var C = {
   C: Ѕ("res/share-icon.jpg"),
   _: window.location.href,
   title: "",
-  НϹ: "你也来挑战吧，看谁摄的准！",
+  НϹ: "",
   ΥЈ: "",
   l: function () {},
 };
 C.ΝΡ = function (Р) {
-  return "狂摄 iPhone 6，我摄了 " + Р.y8 + " 分，你能比我摄的准吗？";
+  return "";
 };
 C.Ѕ = C.НϹ;
 function Ѕ(U) {
@@ -2607,6 +2607,22 @@ var p = [
   {
     id: "title-img",
     src: "res/congratulations.png",
+  },
+  {
+    id: "icon-img",
+    src: "res/icon.png",
+  },
+  {
+    id: "good-img",
+    src: "res/good.png",
+  },
+  {
+    id: "higher-img",
+    src: "res/higher.png",
+  },
+  {
+    id: "try-img",
+    src: "res/tryAgain.png",
   },
 ];
 (function () {
@@ -2803,13 +2819,7 @@ var i = i || {};
     Ϻ: function (Р) {
       this.ZР = Р;
       this.resize();
-      this.qϜ = [
-        "负分滚粗",
-        "你对得起乔布斯吗?",
-        "小心乔布斯晚上来找你",
-        "你还想要iPhone吗",
-        "你不太适合这种高智商的游戏",
-      ];
+      this.qϜ = [];
     },
     resize: function () {
       this.width = 440;
@@ -2881,16 +2891,6 @@ var i = i || {};
         this.ZР.dΜ.Y8 = true;
         this.ZР.dΜ.Τi = false;
       }
-      //  postMessage
-      window.parent.postMessage(
-        {
-          type: "gameOver",
-          data: {
-            score: this.Ε4.k6.toFixed(2),
-          },
-        },
-        "*"
-      );
     },
     uT: function (X, f) {
       var T = this;
@@ -3510,28 +3510,32 @@ var Н = Best.hg.extend({
     V.fillStyle = "rgba(0,0,0,0.6)";
     V.fillRect(0, 0, this.width, this.height);
 
-    // 计算放大后的尺寸
-    var scale = 1.3; // 放大倍数,可以调整
-    var newWidth = this.ΙY.width * scale;
-    var newHeight = this.ΙY.height * scale;
+    // 主圖放大
+    var scale1 = 1.3; // 主圖放大倍數
+    var newWidth1 = this.ΙY.width * scale1;
+    var newHeight1 = this.ΙY.height * scale1;
 
-    // 居中绘制放大后的图片
+    // 居中繪製放大後的主圖
     V.drawImage(
       this.ΙY,
-      (this.width - newWidth) >> 1, // 水平居中
-      (this.height - newHeight - 100) >> 1, // 垂直居中
-      newWidth, // 放大后的宽度
-      newHeight // 放大后的高度
+      (this.width - newWidth1) >> 1, // 水平居中
+      (this.height - newHeight1 - 100) >> 1, // 垂直居中
+      newWidth1, // 放大後的寬度
+      newHeight1 // 放大後的高度
     );
 
+    // 按鈕圖放大
     const keepImg = ResourcePool.get("keep-btn");
+    var scale2 = 1.5; // 按鈕圖放大倍數
+    var newWidth2 = keepImg.width * scale2;
+    var newHeight2 = keepImg.height * scale2;
 
     V.drawImage(
       keepImg,
-      (this.width - keepImg.width) >> 1, // 水平置中
-      this.height - 180, // 垂直位置
-      keepImg.width,
-      keepImg.height
+      (this.width - newWidth2) >> 1, // 水平置中
+      this.height - 400, // 垂直位置
+      newWidth2, // 放大後的寬度
+      newHeight2 // 放大後的高度
     );
 
     V.globalAlpha = 1;
@@ -3593,7 +3597,7 @@ var M = Best.hg.extend({
       var g = 50;
       А.font = g + "px Heiti";
       А.fillStyle = "rgba(0,0,0,1)";
-      А.fillText("你 摄 了 : ", 60, 130);
+      А.fillText("You Get : ", 60, 130);
     }
     this.ng = M.ng;
   },
@@ -3649,6 +3653,58 @@ var M = Best.hg.extend({
       decoCtx.drawImage(decoImg, 0, 0, imgWidth, imgHeight);
     }
     this.decoration = M.decoration;
+
+    // icon 裝飾圖
+    if (!M.iconImage) {
+      const iconImg = ResourcePool.get("icon-img");
+      const scale = 0.4; // 可以調整縮放比例
+      const imgWidth = iconImg.width * scale;
+      const imgHeight = iconImg.height * scale;
+
+      var iconDecoration = (M.iconImage = t.ІJ(imgWidth, imgHeight, 0));
+      var iconCtx = iconDecoration.getContext("2d");
+      iconCtx.drawImage(iconImg, 0, 0, imgWidth, imgHeight);
+    }
+    this.iconImage = M.iconImage;
+
+    // good 裝飾圖
+    if (!M.goodImage) {
+      const goodImg = ResourcePool.get("good-img");
+      const scale = 0.5;
+      const imgWidth = goodImg.width * scale;
+      const imgHeight = goodImg.height * scale;
+
+      var goodDecoration = (M.goodImage = t.ІJ(imgWidth, imgHeight, 0));
+      var goodCtx = goodDecoration.getContext("2d");
+      goodCtx.drawImage(goodImg, 0, 0, imgWidth, imgHeight);
+    }
+    this.goodImage = M.goodImage;
+
+    // higher 裝飾圖
+    if (!M.higherImage) {
+      const higherImg = ResourcePool.get("higher-img");
+      const scale = 0.5;
+      const imgWidth = higherImg.width * scale;
+      const imgHeight = higherImg.height * scale;
+
+      var higherDecoration = (M.higherImage = t.ІJ(imgWidth, imgHeight, 0));
+      var higherCtx = higherDecoration.getContext("2d");
+      higherCtx.drawImage(higherImg, 0, 0, imgWidth, imgHeight);
+    }
+    this.higherImage = M.higherImage;
+
+    // try 裝飾圖
+    if (!M.tryImage) {
+      const tryImg = ResourcePool.get("try-img");
+      const scale = 0.5;
+      const imgWidth = tryImg.width * scale;
+      const imgHeight = tryImg.height * scale;
+
+      var tryDecoration = (M.tryImage = t.ІJ(imgWidth, imgHeight, 0));
+      var tryCtx = tryDecoration.getContext("2d");
+      tryCtx.drawImage(tryImg, 0, 0, imgWidth, imgHeight);
+    }
+    this.tryImage = M.tryImage;
   },
 
   resize: function () {
@@ -3659,34 +3715,59 @@ var M = Best.hg.extend({
 
     // 計算按鈕位置
     const spacing = 40; // 按鈕之間的間距
-    const btnY = this.height - 500; // 共同的垂直位置
-    const imgY = this.height - 600; // 共同的垂直位置
+    const btnY = this.height - 450; // 共同的垂直位置
+    const leftMargin = 50; // 左邊距離
 
     // 計算左邊按鈕的位置 (重新開始)
-    this.cТ = t.cЕ(
-      this.cΑ,
-      this.width / 2 - this.cΑ.width - spacing / 2, // 水平位置靠左
-      btnY
-    );
+    this.cТ = t.cЕ(this.cΑ, this.width / 2 - this.cΑ.width - spacing / 2, btnY);
 
     // 計算右邊按鈕的位置 (前往連結)
     this.linkButtonRect = t.cЕ(
       this.linkButton,
-      this.width / 2 + spacing / 2, // 水平位置靠右
+      this.width / 2 + spacing / 2,
       btnY
     );
-    // 分享按鈕
+
+    // 分享按鈕 - 移到右下角
     this.shareButtonRect = t.cЕ(
       this.shareButton,
-      this.width / 2 + spacing / 2, // 水平位置靠右
-      this.height
+      this.width - this.shareButton.width - 0,
+      this.height - this.shareButton.height - 0
     );
 
-    // 裝飾圖案
+    // 裝飾圖位置
     this.decorationRect = t.cЕ(
       this.decoration,
-      this.width, // 水平位置靠右
-      imgY
+      (this.width - this.decoration.width) >> 1,
+      btnY - this.decoration.height - spacing
+    );
+
+    // icon 圖片放在左下角
+    this.iconImageRect = t.cЕ(
+      this.iconImage,
+      leftMargin,
+      this.height - this.iconImage.height - 0
+    );
+
+    // good 圖片放在 icon 的右上方
+    this.goodImageRect = t.cЕ(
+      this.goodImage,
+      leftMargin + this.iconImage.width + spacing + 0,
+      this.height - this.iconImage.height - this.goodImage.height + 100
+    );
+
+    // try 圖片和 good 重疊
+    this.tryImageRect = t.cЕ(
+      this.tryImage,
+      this.goodImageRect[0],
+      this.goodImageRect[1]
+    );
+
+    // higher 圖片和 finish 重疊
+    this.higherImageRect = t.cЕ(
+      this.higherImage,
+      this.linkButtonRect[0],
+      this.linkButtonRect[1]
     );
   },
   cF: function () {
@@ -3726,30 +3807,45 @@ var M = Best.hg.extend({
       this.Ε4.PΝ(Κ, W, G);
     }
     if (this.iΥ) {
+      // 重新開始按鈕永遠顯示
       Κ.drawImage(this.cΑ, this.cТ[0], this.cТ[1]);
-      // 绘制新的"前往連結"按钮
-      Κ.drawImage(
-        this.linkButton,
-        this.linkButtonRect[0],
-        this.linkButtonRect[1]
-      );
+
+      // 根據分數決定顯示的元素
+      if (this.Ε4 && this.Ε4.k6 >= 90) {
+        // 分數大於等於90
+        Κ.drawImage(
+          this.linkButton,
+          this.linkButtonRect[0],
+          this.linkButtonRect[1]
+        );
+        Κ.drawImage(
+          this.goodImage,
+          this.goodImageRect[0],
+          this.goodImageRect[1]
+        );
+      } else {
+        // 分數小於90
+        Κ.drawImage(
+          this.higherImage,
+          this.higherImageRect[0],
+          this.higherImageRect[1]
+        );
+        Κ.drawImage(this.tryImage, this.tryImageRect[0], this.tryImageRect[1]);
+      }
+
+      // 分享按鈕和其他裝飾圖永遠顯示
       Κ.drawImage(
         this.shareButton,
         this.shareButtonRect[0],
         this.shareButtonRect[1]
       );
-      // 繪製其餘裝飾
       Κ.drawImage(
         this.decoration,
         this.decorationRect[0],
         this.decorationRect[1]
       );
+      Κ.drawImage(this.iconImage, this.iconImageRect[0], this.iconImageRect[1]);
     }
-    Κ.drawImage(
-      this.xϜ,
-      this.width - this.xϜ.width - 10,
-      5 + Math.sin(G / 100) * 3
-    );
     var j = t.Gx(decodeURIComponent(this.pϹ));
     var d = Κ.measureText(j);
     Κ.fillStyle = "#fff";
@@ -3764,26 +3860,38 @@ var M = Best.hg.extend({
       if (I < 400) {
         var K = Χ.x * С.Тq;
         var a = Χ.y * С.Тq;
+
         if (a > this.height - 100 && this.Оc) {
           В.v = null;
           t.НЅ(this.Оc);
         } else if (this.iΥ && t.PΗ(K, a, this.cТ)) {
+          В.v = null;
+          this.AΥ();
+        } else if (this.iΥ && t.PΗ(K, a, this.linkButtonRect)) {
+          // 只有當分數大於90時才處理前往連結按鈕點擊
+          if (this.Ε4 && this.Ε4.k6 >= 90) {
+            В.v = null;
+            window.parent.postMessage(
+              {
+                type: "gameOver",
+                data: {
+                  score: this.Ε4.k6.toFixed(2),
+                },
+              },
+              "*"
+            );
+          }
+        } else if (this.iΥ && t.PΗ(K, a, this.shareButtonRect)) {
+          В.v = null;
           window.parent.postMessage(
             {
-              type: "gameOver",
+              type: "copyUrl",
               data: {
                 score: this.Ε4.k6.toFixed(2),
-                action: "restart",
               },
             },
             "*"
           );
-          В.v = null;
-          this.AΥ();
-        } else if (this.iΥ && t.PΗ(K, a, this.linkButtonRect)) {
-          // 处理"前往連結"按钮点击
-          В.v = null;
-          window.open("https://www.google.com.tw/index.html", "_blank");
         }
       }
     }

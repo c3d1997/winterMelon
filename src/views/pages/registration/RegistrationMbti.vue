@@ -29,7 +29,9 @@
               <div class="carousel_content">
                 <p>{{ item.title }}</p>
                 <p>{{ item.type }}</p>
-                <div class="carousel_item"></div>
+                <div class="carousel_item">
+                  <img :src="`/images/melonStyle/${item.key}.png`" alt="" />
+                </div>
                 <span>{{ item.description }}</span>
               </div>
             </Slide>
@@ -115,8 +117,8 @@ const mbtiTypes = [
   },
   {
     title: "Intuitive Winter Melon",
-    type: "(M type)",
-    key: "M",
+    type: "(N type)",
+    key: "N",
     description:
       "May develop unexpected traits, such as unique shapes or colors.",
   },
@@ -158,7 +160,7 @@ const submitStart = async () => {
   const mbtiResult = await set_mbti(mbitData);
   if (mbtiResult.status == "success") {
     console.log("設定mbti成功");
-
+    await userStore.getMemberInfo();
     router.push("/game");
   } else if (mbtiResult.status == "error") {
     console.log("設定mbti錯誤");
@@ -303,7 +305,13 @@ const submitStart = async () => {
   &_item {
     height: 180px;
     width: 180px;
-    background-color: $support-color;
+    // background-color: $support-color;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    img {
+      height: 90%;
+    }
   }
   &_content {
     display: flex;

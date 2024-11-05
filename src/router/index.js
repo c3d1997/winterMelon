@@ -97,6 +97,12 @@ router.beforeEach(async (to, from, next) => {
   const userStore = useUserStore();
   const token = getCookie("accessToken");
   const expiration = getCookie("exp");
+  console.log("token", token);
+  console.log("expiration", expiration);
+
+  console.log(to.name);
+  console.log(userStore.user.mbti == "");
+  console.log(userStore.user.mbti == null);
   const formatDate = (date) => {
     const pad = (num) => String(num).padStart(2, "0");
 
@@ -113,7 +119,21 @@ router.beforeEach(async (to, from, next) => {
 
   // 檢查是否未登入或 token 過期
   const isUnauthorized =
-    (token == undefined && expiration == undefined) || expiration < currentTime;
+    !token ||
+    token === "null" ||
+    token === "" ||
+    !expiration ||
+    expiration === "null" ||
+    expiration === "" ||
+    expiration < currentTime;
+  // 定義不需要驗證的路由
+  const publicPages = ["/registration"];
+  const authRequired = !publicPages.includes(to.path);
+
+  // 未授權且訪問需要驗證的頁面時才重定向
+  if (isUnauthorized && authRequired) {
+    return next("/registration");
+  }
 
   if (to.name === "registration") {
     console.log("進入註冊");
@@ -122,22 +142,19 @@ router.beforeEach(async (to, from, next) => {
     }
     return next("/registration/mbti");
   }
-
-  if (to.name === "mbti") {
-    console.log("進入mbti");
-    userStore.getMemberInfo();
-    console.log(userStore.user.mbti);
-    if (userStore.user.mbti == "") {
-      return next();
-    } else {
-      return next("/game");
+  if (!userStore.user.mbti) {
+    if (to.name !== "mbti") {
+      await userStore.getMemberInfo();
+      return next("/registration/mbti");
     }
+  } else if (to.name === "mbti") {
+    return next("/game");
   }
 
-  // 處理其他所有路由
-  if (isUnauthorized) {
+  if (to.name === undefined || to.name === "/") {
     return next("/registration");
   }
+
   return next();
 });
 
