@@ -1,5 +1,6 @@
 // stores/timerStore.js
 import { defineStore } from "pinia";
+import { useUserStore } from "./userStore";
 
 export const useTimerStore = defineStore("timer", {
   state: () => ({
@@ -35,7 +36,7 @@ export const useTimerStore = defineStore("timer", {
     updateRemainingTime() {
       const now = new Date();
       const targetTime = this.getNextTargetTime();
-
+      const userStore = useUserStore();
       // 計算剩餘毫秒數
       this.remainingTime = targetTime - now;
 
@@ -49,6 +50,9 @@ export const useTimerStore = defineStore("timer", {
       // 如果時間到了，重新計算下一個時間點
       if (this.remainingTime <= 0) {
         this.stopTimer();
+        userStore.getMemberInfo().then(() => {
+          this.startTimer();
+        });
       }
     },
 

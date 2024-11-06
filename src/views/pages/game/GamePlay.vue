@@ -6,13 +6,20 @@
       is_pop ||
       is_collect ||
       is_finish ||
-      (melonStatus == 0 && userStore.user?.play_times == 1)
+      ((melonStatus == 0 || melonStatus == 1) &&
+        userStore.user?.play_times == 1 &&
+        userStore.is_example != 2)
     "
   ></div>
   <!-- 遊戲教學1 -->
   <div
     class="popup gamePop"
-    v-if="!is_pop && melonStatus == 0 && userStore.user?.play_times == 1"
+    v-if="
+      !is_pop &&
+      melonStatus == 0 &&
+      userStore.user?.play_times == 1 &&
+      userStore.is_example == 0
+    "
   >
     <div class="gameTeach gameTeach1">
       <p>
@@ -20,13 +27,13 @@
         first collection
       </p>
     </div>
-    <div class="gameBottom_btn" @click="collectPop">
+    <div class="gameBottom_btn" @click.stop="collectPop">
       <img
-        :class="{ filterSet: melonStatus != 0 }"
+        :class="{ filterSet: melonStatus != 0 && userStore.is_example != 0 }"
         src="/images/collect.png"
         alt=""
       />
-      <p v-if="melonStatus != 0">
+      <p v-if="melonStatus != 0 && userStore.is_example != 0">
         {{ timerStore.formatTime() }}
       </p>
     </div>
@@ -34,12 +41,18 @@
   <!-- 遊戲教學2 -->
   <div
     class="popup gamePop"
-    v-if="!is_pop && melonStatus == 1 && userStore.user?.play_times == 1"
+    v-if="
+      !is_pop &&
+      userStore.user?.play_times == 1 &&
+      userStore.is_example == 1 &&
+      melonStatus == 1
+    "
+    @click="skipExample"
   >
     <div class="gameTeach gameTeach2">
       <p>
-        Collect to <br />
-        unlock the game
+        Try the game by clicking on it<br />
+        or click anywhere else to skip
       </p>
     </div>
     <div class="gameBottom_gameStyle">
@@ -47,9 +60,6 @@
         <div class="gameBottom_game-set">
           <img
             @click="router.push('game/melonRun')"
-            :class="{
-              filterSet: melonStatus == 0,
-            }"
             src="/images/game1.png"
             alt=""
           />
@@ -57,9 +67,6 @@
         <div class="gameBottom_game-set">
           <img
             @click="router.push('game/melonCamera')"
-            :class="{
-              filterSet: melonStatus == 0,
-            }"
             src="/images/game2.png"
             alt=""
           />
@@ -104,7 +111,7 @@
     </div>
   </div>
   <!-- 完成蒐集 -->
-  <div class="popup" v-if="is_finish">
+  <div class="popup" v-if="is_finish && !is_collect_animation">
     <div class="popup_card">
       <div class="popup_card-content finish">
         <p>Congratulations !</p>
@@ -122,14 +129,19 @@
     <div class="gameTop">
       <div>
         <div class="gameTop_profile">
-          <img src="/images/profileHead.png" alt="" />
+          <img :src="`/images/melonStyle/${userStore.user.mbti}.png`" alt="" />
         </div>
-        <div class="gameTop_name">Seed State</div>
+        <div class="gameTop_name">
+          <img
+            :src="`/images/state_${userStore.user.melon_info.melon_status}.png`"
+            alt=""
+          />
+        </div>
       </div>
       <div class="gameTop_mission">
         <div class="gameTop_mission-left">
           <p>MISSION</p>
-          <span>{{ userStore.user.melon_info.melon_status }} / 4</span>
+          <span>{{ userStore.user.melon_info.melon_status }} / 3</span>
         </div>
         <div class="gameTop_mission-right">
           <img @click="is_pop = true" src="/images/qa.png" alt="" />
@@ -137,9 +149,15 @@
       </div>
     </div>
     <div class="gameMid">
-      <img :src="`/images/melonStatus/${melonStatus}.png`" alt="" />
+      <transition name="fade">
+        <img
+          :src="`/images/melonStatus/status_${melonStatus}.png`"
+          alt=""
+          :key="melonStatus"
+        />
+      </transition>
       <div class="gameMid_collect" :style="randomPosition">
-        <img src="/images/collectEX.png" alt="" />
+        <img src="/images/box.png" alt="" />
       </div>
     </div>
     <div class="gameBottom">
@@ -147,25 +165,34 @@
       <div class="gameBottom_box">
         <div class="gameBottom_box-package">
           <img src="/images/collect_1.png" alt="" />
-          <div class="gameBottom_box-index">1</div>
+          <div class="gameBottom_box-index">{{ collectionCounts.air }}</div>
         </div>
         <div class="gameBottom_box-package">
           <img src="/images/collect_2.png" alt="" />
-          <div class="gameBottom_box-index">1</div>
+          <div class="gameBottom_box-index">{{ collectionCounts.sun }}</div>
         </div>
         <div class="gameBottom_box-package">
           <img src="/images/collect_3.png" alt="" />
-          <div class="gameBottom_box-index">1</div>
+          <div class="gameBottom_box-index">{{ collectionCounts.water }}</div>
         </div>
       </div>
       <div class="gameBottom_item">item</div>
       <div class="gameBottom_btn" @click="collectPop">
         <img
-          :class="{ filterSet: !is_collection }"
+          :class="{
+            filterSet:
+              (!userStore.is_gameFirst && !is_collection) ||
+              (userStore.is_example && !is_collection),
+          }"
           src="/images/collect.png"
           alt=""
         />
-        <p v-if="!is_collection && userStore.is_example">
+        <p
+          v-if="
+            (!userStore.is_gameFirst && !is_collection) ||
+            (userStore.is_example && !is_collection)
+          "
+        >
           {{ timerStore.formatTime() }}
         </p>
       </div>
@@ -174,27 +201,43 @@
         <div class="gameBottom_game">
           <div class="gameBottom_game-set">
             <img
-              @click="router.push('game/melonRun')"
+              @click="routerToRun"
               :class="{
-                filterSet: !is_game_one || is_finish,
+                filterSet:
+                  is_finish ||
+                  (!userStore.is_gameFirst && !is_game_one) ||
+                  (userStore.is_example && !is_game_one),
               }"
               src="/images/game1.png"
               alt=""
             />
-            <p v-if="!is_game_one && userStore.is_example">
+            <p
+              v-if="
+                (!userStore.is_gameFirst && !is_game_one) ||
+                (userStore.is_example && !is_game_one)
+              "
+            >
               {{ timerStore.formatTime() }}
             </p>
           </div>
           <div class="gameBottom_game-set">
             <img
-              @click="router.push('game/melonCamera')"
+              @click="routerToCamera"
               :class="{
-                filterSet: !is_game_two || is_finish,
+                filterSet:
+                  is_finish ||
+                  (!userStore.is_gameFirst && !is_game_two) ||
+                  (userStore.is_example && !is_game_two),
               }"
               src="/images/game2.png"
               alt=""
             />
-            <p v-if="!is_game_two && userStore.is_example">
+            <p
+              v-if="
+                (!userStore.is_gameFirst && !is_game_two) ||
+                (userStore.is_example && !is_game_two)
+              "
+            >
               {{ timerStore.formatTime() }}
             </p>
           </div>
@@ -205,7 +248,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useUserStore } from "@/stores/userStore";
 import { useTimerStore } from "@/stores/timeStore";
@@ -243,7 +286,7 @@ const generateRandomPosition = () => {
   const isNegativeLeft = Math.random() < 0.5;
   let randomTop, randomLeft;
   if (isNegativeTop) {
-    randomTop = Math.floor(Math.random() * 100) * -1;
+    randomTop = Math.floor(Math.random() * 50) * -1;
   } else {
     randomTop = Math.floor(Math.random() * 50) + 50;
   }
@@ -262,22 +305,26 @@ const is_finish = ref(false);
 const melonStatus = ref();
 onMounted(async () => {
   timerStore.startTimer();
+  calculateCollection();
   generateRandomPosition();
   await userStore.getMemberInfo();
-  melonStatus.value = userStore.user.melon_info.melon_status;
 
-  if (userStore.user.melon_info.melon_status == 0) {
-    is_pop.value = true;
-    userStore.is_example = 0;
-  } else {
-    console.log("不是第一次");
-    is_collection.value = userStore.user.setting_info.is_collection;
-    is_game_one.value = userStore.user.setting_info.is_game_one;
-    is_game_two.value = userStore.user.setting_info.is_game_two;
+  const { melon_status } = userStore.user.melon_info;
+  const settingInfo = userStore.user.setting_info;
+
+  melonStatus.value = melon_status;
+  is_pop.value = melon_status === 0;
+  is_finish.value = melon_status === 3;
+
+  if (melon_status !== 0) {
+    is_collection.value = settingInfo.is_collection;
+    is_game_one.value = settingInfo.is_game_one;
+    is_game_two.value = settingInfo.is_game_two;
   }
-  if (userStore.user.melon_info.melon_status == 3) {
-    is_finish.value = true;
-  }
+
+  userStore.is_gameFirst =
+    (melon_status === 0 || melon_status === 1) &&
+    settingInfo.is_collection == false;
 });
 
 watch(
@@ -297,33 +344,68 @@ watch(
 watch(
   () => userStore.user.melon_info.melon_status,
   (newStatus) => {
-    melonStatus.value = newStatus;
-    console.log(melonStatus.value, "melonStatus");
     if (newStatus === 0) {
       is_pop.value = true;
-      userStore.is_example = 0;
     } else if (newStatus === 3) {
       is_finish.value = true;
     }
   }
 );
-const is_clickCollect = ref();
+// 監聽是否還在遊戲試玩
+watch(
+  [
+    () => userStore.user.melon_info.melon_status,
+    () => userStore.user.setting_info.is_collection,
+  ],
+  ([newValue1, newValue2]) => {
+    if ((newValue1 == 0 || newValue1 == 1) && newValue2 == false) {
+      userStore.is_gameFirst = true;
+    } else {
+      userStore.is_gameFirst = false;
+    }
+  }
+);
+
+// 前往跑跑
+const routerToRun = () => {
+  if ((!is_game_one.value || is_finish.value) && !userStore.is_gameFirst) {
+    return;
+  } else {
+    router.push("game/melonRun");
+  }
+};
+// 前往照相
+const routerToCamera = () => {
+  if ((!is_game_two || is_finish) && !userStore.is_gameFirst) {
+    return;
+  } else {
+    router.push("game/melonCamera");
+  }
+};
+// 跳過步驟方式
+const skipExample = () => {
+  console.log("跳過試玩");
+  if (userStore.is_example == 1) {
+    userStore.is_example = 2;
+    userStore.is_gameFirst = false;
+  }
+};
+const collectObject = ref();
 const collectPop = async () => {
   if (isSubmitting.value) return;
   try {
-    is_clickCollect.value = true;
     isSubmitting.value = true;
     if (!is_finish.value) {
       console.log("尚未結束");
-      is_collect.value = true;
-      is_collect_animation.value = true;
       if (userStore.user.melon_info.melon_status == 0) {
         console.log("進入第一次回報");
         const firstCollectionResult = await completed_first_task();
         if (firstCollectionResult.status == "success") {
           console.log("第一次回報成功");
+          is_collect.value = true;
+          is_collect_animation.value = true;
+          userStore.is_example = 2;
           await userStore.getMemberInfo();
-          is_collect.value = false;
         } else if (firstCollectionResult.status == "error") {
           console.log("第一次回報失敗");
         }
@@ -335,9 +417,10 @@ const collectPop = async () => {
         const normalCollectionResult = await get_collection();
         if (normalCollectionResult.status == "success") {
           console.log("收集物品成功");
+          is_collect.value = true;
+          is_collect_animation.value = true;
           const memberInfo = await get_member_info();
           userStore.user = memberInfo.payload.data;
-          is_collect.value = false;
         } else if (normalCollectionResult.status == "error") {
           console.log("收集物品失敗");
         }
@@ -366,10 +449,11 @@ const collectPop = async () => {
 const collectItem = ref(null);
 const is_collect_animation = ref(false);
 const submitCollect = async () => {
-  console.log("按下蒐集", isSubmitting.value);
+  console.log("按下ok", isSubmitting.value);
   if (isSubmitting.value) return;
   try {
     isSubmitting.value = true;
+    is_collect.value = false;
     animationCollect(1);
   } catch (error) {
     console.log("蒐集失敗", error);
@@ -403,6 +487,9 @@ const animationCollect = async (e) => {
   const tl = gsap.timeline({
     onComplete: () => {
       is_collect_animation.value = false;
+      userStore.is_example = 1;
+      calculateCollection();
+      melonStatus.value = userStore.user.melon_info.melon_status;
     },
   });
 
@@ -429,6 +516,36 @@ const animationCollect = async (e) => {
     yoyo: true,
     repeat: 1,
   });
+};
+
+const collectionCounts = ref({
+  air: 0,
+  sun: 0,
+  water: 0,
+});
+
+const countCollection = (collection) => {
+  const counts = {
+    air: 0,
+    sun: 0,
+    water: 0,
+  };
+
+  collection.forEach((item) => {
+    // 中轉英
+    let key;
+    if (item.includes("空氣")) key = "air";
+    else if (item.includes("陽光")) key = "sun";
+    else if (item.includes("水")) key = "water";
+
+    counts[key]++;
+  });
+
+  return counts;
+};
+
+const calculateCollection = () => {
+  collectionCounts.value = countCollection(userStore.user.collection);
 };
 </script>
 
@@ -490,23 +607,9 @@ const animationCollect = async (e) => {
     position: relative;
     width: 120px;
     height: 25px;
-    border: 7px solid;
-    border-image: url(/images/border_05.png) stretch;
-    border-image-slice: 26 fill;
-    font-size: 12px;
-    line-height: 12px;
-    text-align: center;
-    color: $main-color;
-    margin-top: -2px;
-    &::after {
-      content: "";
-      position: absolute;
-      width: calc(100% + 7px);
-      height: calc(100% + 7px);
-      left: -3.5px;
-      top: -3.5px;
-      z-index: -1;
-      background-color: #dce0d2;
+    top: -2px;
+    img {
+      width: 100%;
     }
   }
   &_mission {
@@ -561,6 +664,7 @@ const animationCollect = async (e) => {
   top: calc(50dvh - 75px);
   left: calc(50% - 75px);
   width: 150px;
+  height: 150px;
   position: relative;
   z-index: 0;
   img {
@@ -832,5 +936,16 @@ const animationCollect = async (e) => {
     font-size: 16px;
     line-height: 18px;
   }
+}
+
+// 動畫
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

@@ -9,6 +9,7 @@ export const useUserStore = defineStore("user", {
     loveType: "",
     openSelectId: null,
     is_example: "",
+    is_gameFirst: "",
   }),
   actions: {
     setOpenSelect(id) {
@@ -18,9 +19,17 @@ export const useUserStore = defineStore("user", {
       this.openSelectId = null;
     },
     async getMemberInfo() {
+      const router = useRouter();
+      const route = useRoute();
       try {
         const member = await get_member_info();
-        this.user = member.payload.data;
+        if (member.status == "success") {
+          console.log("member正確");
+          this.user = member.payload.data;
+        } else if (member.status == "error") {
+          console.log("member錯誤");
+        }
+
         return member;
       } catch (error) {
         console.error("獲取使用者資料失敗:", error);
@@ -32,6 +41,7 @@ export const useUserStore = defineStore("user", {
     enabled: true,
     loveType: true,
     is_example: true,
+    is_gameFirst: true,
     strategies: [
       {
         key: "my_user_store",
