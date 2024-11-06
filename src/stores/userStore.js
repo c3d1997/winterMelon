@@ -8,6 +8,7 @@ export const useUserStore = defineStore("user", {
     user: "",
     loveType: "",
     openSelectId: null,
+    is_example: "",
   }),
   actions: {
     setOpenSelect(id) {
@@ -30,6 +31,7 @@ export const useUserStore = defineStore("user", {
   persist: {
     enabled: true,
     loveType: true,
+    is_example: true,
     strategies: [
       {
         key: "my_user_store",

@@ -9,15 +9,10 @@
       (melonStatus == 0 && userStore.user?.play_times == 1)
     "
   ></div>
-  <!-- 遊戲教學 -->
+  <!-- 遊戲教學1 -->
   <div
     class="popup gamePop"
-    v-if="
-      !is_pop &&
-      melonStatus == 0 &&
-      !is_clickCollect &&
-      userStore.user?.play_times == 1
-    "
+    v-if="!is_pop && melonStatus == 0 && userStore.user?.play_times == 1"
   >
     <div class="gameTeach gameTeach1">
       <p>
@@ -27,14 +22,20 @@
     </div>
     <div class="gameBottom_btn" @click="collectPop">
       <img
-        :class="{ filterSet: !is_collection && melonStatus != 0 }"
+        :class="{ filterSet: melonStatus != 0 }"
         src="/images/collect.png"
         alt=""
       />
-      <p v-if="!is_collection && melonStatus != 0">
+      <p v-if="melonStatus != 0">
         {{ timerStore.formatTime() }}
       </p>
     </div>
+  </div>
+  <!-- 遊戲教學2 -->
+  <div
+    class="popup gamePop"
+    v-if="!is_pop && melonStatus == 1 && userStore.user?.play_times == 1"
+  >
     <div class="gameTeach gameTeach2">
       <p>
         Collect to <br />
@@ -47,27 +48,21 @@
           <img
             @click="router.push('game/melonRun')"
             :class="{
-              filterSet: (!is_game_one || is_finish) && melonStatus == 0,
+              filterSet: melonStatus == 0,
             }"
             src="/images/game1.png"
             alt=""
           />
-          <p v-if="!is_game_one && melonStatus != 0">
-            {{ timerStore.formatTime() }}
-          </p>
         </div>
         <div class="gameBottom_game-set">
           <img
             @click="router.push('game/melonCamera')"
             :class="{
-              filterSet: (!is_game_two || is_finish) && melonStatus == 0,
+              filterSet: melonStatus == 0,
             }"
             src="/images/game2.png"
             alt=""
           />
-          <p v-if="!is_game_two && melonStatus != 0">
-            {{ timerStore.formatTime() }}
-          </p>
         </div>
       </div>
     </div>
@@ -151,26 +146,26 @@
       <div class="gameBottom_BG"></div>
       <div class="gameBottom_box">
         <div class="gameBottom_box-package">
-          <img src="/images/water.png" alt="" />
+          <img src="/images/collect_1.png" alt="" />
           <div class="gameBottom_box-index">1</div>
         </div>
         <div class="gameBottom_box-package">
-          <img src="/images/air.png" alt="" />
+          <img src="/images/collect_2.png" alt="" />
           <div class="gameBottom_box-index">1</div>
         </div>
         <div class="gameBottom_box-package">
-          <img src="/images/sun.png" alt="" />
+          <img src="/images/collect_3.png" alt="" />
           <div class="gameBottom_box-index">1</div>
         </div>
       </div>
       <div class="gameBottom_item">item</div>
       <div class="gameBottom_btn" @click="collectPop">
         <img
-          :class="{ filterSet: !is_collection && melonStatus != 0 }"
+          :class="{ filterSet: !is_collection }"
           src="/images/collect.png"
           alt=""
         />
-        <p v-if="!is_collection && melonStatus != 0">
+        <p v-if="!is_collection && userStore.is_example">
           {{ timerStore.formatTime() }}
         </p>
       </div>
@@ -181,12 +176,12 @@
             <img
               @click="router.push('game/melonRun')"
               :class="{
-                filterSet: !is_game_one || is_finish || melonStatus == 0,
+                filterSet: !is_game_one || is_finish,
               }"
               src="/images/game1.png"
               alt=""
             />
-            <p v-if="!is_game_one || melonStatus == 0">
+            <p v-if="!is_game_one && userStore.is_example">
               {{ timerStore.formatTime() }}
             </p>
           </div>
@@ -194,12 +189,12 @@
             <img
               @click="router.push('game/melonCamera')"
               :class="{
-                filterSet: !is_game_two || is_finish || melonStatus == 0,
+                filterSet: !is_game_two || is_finish,
               }"
               src="/images/game2.png"
               alt=""
             />
-            <p v-if="!is_game_two || melonStatus == 0">
+            <p v-if="!is_game_two && userStore.is_example">
               {{ timerStore.formatTime() }}
             </p>
           </div>
@@ -273,6 +268,7 @@ onMounted(async () => {
 
   if (userStore.user.melon_info.melon_status == 0) {
     is_pop.value = true;
+    userStore.is_example = 0;
   } else {
     console.log("不是第一次");
     is_collection.value = userStore.user.setting_info.is_collection;
@@ -305,6 +301,7 @@ watch(
     console.log(melonStatus.value, "melonStatus");
     if (newStatus === 0) {
       is_pop.value = true;
+      userStore.is_example = 0;
     } else if (newStatus === 3) {
       is_finish.value = true;
     }
@@ -320,6 +317,31 @@ const collectPop = async () => {
       console.log("尚未結束");
       is_collect.value = true;
       is_collect_animation.value = true;
+      if (userStore.user.melon_info.melon_status == 0) {
+        console.log("進入第一次回報");
+        const firstCollectionResult = await completed_first_task();
+        if (firstCollectionResult.status == "success") {
+          console.log("第一次回報成功");
+          await userStore.getMemberInfo();
+          is_collect.value = false;
+        } else if (firstCollectionResult.status == "error") {
+          console.log("第一次回報失敗");
+        }
+      } else if (
+        userStore.user.melon_info.melon_status == 1 ||
+        userStore.user.melon_info.melon_status == 2
+      ) {
+        console.log("使用者收集物品");
+        const normalCollectionResult = await get_collection();
+        if (normalCollectionResult.status == "success") {
+          console.log("收集物品成功");
+          const memberInfo = await get_member_info();
+          userStore.user = memberInfo.payload.data;
+          is_collect.value = false;
+        } else if (normalCollectionResult.status == "error") {
+          console.log("收集物品失敗");
+        }
+      }
     } else {
       console.log("蒐集完畢");
       if (userStore.user.play_times != 1) {
@@ -335,13 +357,12 @@ const collectPop = async () => {
       }
     }
   } catch (error) {
-    console.log("winnin失敗", error);
+    console.log("collect失敗", error);
   } finally {
     isSubmitting.value = false;
   }
 };
 // 蒐集
-
 const collectItem = ref(null);
 const is_collect_animation = ref(false);
 const submitCollect = async () => {
@@ -349,33 +370,7 @@ const submitCollect = async () => {
   if (isSubmitting.value) return;
   try {
     isSubmitting.value = true;
-    if (userStore.user.melon_info.melon_status == 0) {
-      console.log("進入第一次回報");
-      const firstCollectionResult = await completed_first_task();
-      if (firstCollectionResult.status == "success") {
-        console.log("第一次回報成功");
-        await userStore.getMemberInfo();
-        is_collect.value = false;
-        animationCollect(1);
-      } else if (firstCollectionResult.status == "error") {
-        console.log("第一次回報失敗");
-      }
-    } else if (
-      userStore.user.melon_info.melon_status == 1 ||
-      userStore.user.melon_info.melon_status == 2
-    ) {
-      console.log("使用者收集物品");
-      const normalCollectionResult = await get_collection();
-      if (normalCollectionResult.status == "success") {
-        console.log("收集物品成功");
-        const memberInfo = await get_member_info();
-        userStore.user = memberInfo.payload.data;
-        is_collect.value = false;
-        animationCollect(1);
-      } else if (normalCollectionResult.status == "error") {
-        console.log("收集物品失敗");
-      }
-    }
+    animationCollect(1);
   } catch (error) {
     console.log("蒐集失敗", error);
   } finally {
@@ -789,7 +784,7 @@ const animationCollect = async (e) => {
     bottom: 151px;
   }
   .filterSet {
-    filter: brightness(0.6) contrast(0.7);
+    filter: brightness(0.4) contrast(0.7);
   }
 }
 .gameTeach {
